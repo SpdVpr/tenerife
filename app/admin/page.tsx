@@ -11,6 +11,9 @@ import { Calendar, Users, Mail, Phone, Clock, Euro, Loader2, Check, X, Trash2, R
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 
+// Disable static generation for this page
+export const dynamic = 'force-dynamic';
+
 export default function AdminPage() {
   const [bookings, setBookings] = useState<BookingDocument[]>([]);
   const [isLoading, setIsLoading] = useState(true);

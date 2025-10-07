@@ -26,7 +26,7 @@ export default function Hero() {
   };
 
   return (
-    <section id="home" className="relative w-full overflow-hidden" style={{ height: '75vh' }}>
+    <section id="home" className="relative w-full overflow-hidden pt-20" style={{ height: '75vh' }}>
       {/* Background Images with Carousel */}
       {heroImages.map((image, index) => (
         <div
