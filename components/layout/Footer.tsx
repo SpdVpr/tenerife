@@ -1,5 +1,6 @@
 import { Mail, Phone, Instagram, MapPin } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Footer() {
   return (
@@ -32,31 +33,31 @@ export default function Footer() {
             <h4 className="text-lg font-semibold mb-4">Rychlé odkazy</h4>
             <div className="space-y-3">
               <a
-                href="/#apartment"
+                href="#apartment"
                 className="block text-gray-400 hover:text-white transition-colors"
               >
                 Apartmán
               </a>
               <a
-                href="/#gallery"
+                href="#gallery"
                 className="block text-gray-400 hover:text-white transition-colors"
               >
                 Galerie
               </a>
               <a
-                href="/#pricing"
+                href="#pricing"
                 className="block text-gray-400 hover:text-white transition-colors"
               >
                 Ceník
               </a>
-              <a
+              <Link
                 href="/guest-book"
                 className="block text-gray-400 hover:text-white transition-colors"
               >
                 Guest Book
-              </a>
+              </Link>
               <a
-                href="/#booking"
+                href="#booking"
                 className="block text-gray-400 hover:text-white transition-colors"
               >
                 Rezervace

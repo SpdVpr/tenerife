@@ -131,24 +131,6 @@ export default function Booking() {
     }
   };
 
-  const handleNext = () => {
-    if (step === 1) {
-      if (!formData.checkIn || !formData.checkOut || nights < 5) {
-        alert('Prosím vyplňte všechna pole a vyberte minimálně 5 nocí.');
-        return;
-      }
-      if (availabilityError) {
-        alert('Vybrané termíny nejsou dostupné. Prosím vyberte jiné datum.');
-        return;
-      }
-    }
-    if (step === 2 && (!formData.firstName || !formData.lastName || !formData.email || !formData.phone)) {
-      alert('Prosím vyplňte všechna povinná pole.');
-      return;
-    }
-    setStep(step + 1);
-  };
-
   const canProceedToStep2 = formData.checkIn && formData.checkOut && nights >= 5 && !availabilityError;
   const canProceedToStep3 = formData.firstName && formData.lastName && formData.email && formData.phone;
 

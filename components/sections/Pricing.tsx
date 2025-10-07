@@ -1,4 +1,4 @@
-import { Check, Calendar, CreditCard, Info } from 'lucide-react';
+import { Check, Calendar } from 'lucide-react';
 
 const includedItems = [
   'Všechny energie (elektřina, voda)',

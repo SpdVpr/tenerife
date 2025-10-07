@@ -193,7 +193,7 @@ export default function GuestBook() {
               <h3 className="font-bold text-gray-900 mb-2">Autobus / Public Bus</h3>
               <p className="text-gray-700 mb-2">
                 <strong>www.titsa.com</strong> nebo Google Maps<br />
-                Zastávka: Los Gigantes "Quinto Centenario"
+                Zastávka: Los Gigantes &quot;Quinto Centenario&quot;
               </p>
               <ul className="text-sm text-gray-600 space-y-1">
                 <li>• Z letiště jih: Linka 40 nebo 343 → Costa Adeje → Linka 473 nebo 477 (cca €10)</li>
@@ -395,7 +395,7 @@ export default function GuestBook() {
         <div id="section-7" className="bg-white rounded-2xl shadow-xl p-8 mb-8">
           <div className="flex items-center space-x-3 mb-6">
             <AlertTriangle className="w-8 h-8 text-accent-red" />
-            <h2 className="text-3xl font-bold text-gray-900">7. Španělské "Okupas"</h2>
+            <h2 className="text-3xl font-bold text-gray-900">7. Španělské &quot;Okupas&quot;</h2>
           </div>
 
           <div className="space-y-4">
@@ -590,7 +590,7 @@ export default function GuestBook() {
               <p className="text-gray-700">
                 <strong>🐕 Vaši čtyřnozí přátelé jsou u nás vítáni!</strong><br />
                 Rádi vám poskytneme misku na krmení pro vašeho psa.<br />
-                <em>Your "four-legged friends" are most welcome here in apartments.
+                <em>Your &quot;four-legged friends&quot; are most welcome here in apartments.
                 We are happy to provide a feeding bowl for your dog.</em>
               </p>
             </div>
@@ -620,7 +620,7 @@ export default function GuestBook() {
           </p>
           <p className="text-sm">
             Pro jakékoliv dotazy nás neváhejte kontaktovat.<br />
-            For any questions, don't hesitate to contact us.
+            For any questions, don&apos;t hesitate to contact us.
           </p>
         </div>
       </div>
