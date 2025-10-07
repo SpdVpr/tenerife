@@ -9,7 +9,7 @@ const specifications = [
   { label: 'Kuchyň', value: 'Plně vybavená kuchyňská linka', icon: ChefHat },
   { label: 'Terasa', value: '27 m² s výhledem na oceán', icon: Palmtree },
   { label: 'Plocha', value: '47 m² + terasa 27 m²', icon: Maximize2 },
-  { label: 'Patro', value: '5. patro s výtahem', icon: Building2 },
+  { label: 'Patro', value: '2. patro s výtahem', icon: Building2 },
 ];
 
 const amenities = [
@@ -29,7 +29,7 @@ const amenities = [
 
 export default function ApartmentDetails() {
   return (
-    <section id="details" className="py-20 bg-gradient-to-b from-white via-gray-50 to-white">
+    <section id="details" className="py-20 bg-gradient-to-b from-white via-accent-beige to-white">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
@@ -38,10 +38,10 @@ export default function ApartmentDetails() {
               Detail Apartmánu
             </span>
           </div>
-          <h2 className="text-4xl md:text-6xl font-bold text-gray-900 mb-6">
+          <h2 className="text-4xl md:text-6xl font-bold text-primary-blue mb-6">
             Váš dokonalý domov na dovolené
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
             Moderně zařízený apartmán s panoramatickým výhledem, který nabízí vše pro váš komfortní pobyt
           </p>
         </div>
@@ -126,7 +126,7 @@ export default function ApartmentDetails() {
                 pouze pro rezidenty. Bazén nabízí úchvatný výhled na útes Los Gigantes a Atlantský oceán.
               </p>
               <p className="text-lg leading-relaxed text-white/90">
-                K dispozici jsou také lehátka, slunečníky a sprchy. Ideální místo pro relaxaci
+                K dispozici jsou také lehátka a sprchy. Ideální místo pro relaxaci
                 a odpočinek po dni stráveném objevováním ostrova.
               </p>
             </div>

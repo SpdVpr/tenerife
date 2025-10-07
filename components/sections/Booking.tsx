@@ -36,10 +36,11 @@ export default function Booking() {
 
       setNights(diffDays);
 
-      // Price calculation: 95 EUR for 1-9 nights, 85 EUR for 10+ nights
+      // Price calculation: 95 EUR for 1-9 nights, 85 EUR for 10+ nights + 80 EUR cleaning fee
       const nightPrice = diffDays >= 10 ? 85 : 95;
       setPricePerNight(nightPrice);
-      setTotalPrice(diffDays * nightPrice);
+      const cleaningFee = 80;
+      setTotalPrice(diffDays * nightPrice + cleaningFee);
 
       // Check availability
       setIsCheckingAvailability(true);
@@ -135,14 +136,14 @@ export default function Booking() {
   const canProceedToStep3 = formData.firstName && formData.lastName && formData.email && formData.phone;
 
   return (
-    <section id="booking" className="py-20 bg-gradient-to-b from-gray-50 to-white">
+    <section id="booking" className="py-20 bg-gradient-to-b from-accent-beige to-white">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-primary-blue mb-4">
             Rezervace
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-700 max-w-2xl mx-auto">
             Vyplňte formulář a my vás budeme kontaktovat pro potvrzení rezervace
           </p>
         </div>
@@ -283,6 +284,14 @@ export default function Booking() {
                   <div className="flex justify-between items-center mb-2">
                     <span className="text-gray-700">Cena za noc:</span>
                     <span className="font-bold text-gray-900">{nights >= 10 ? '85' : '95'} EUR</span>
+                  </div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-gray-700">Ubytování celkem:</span>
+                    <span className="font-bold text-gray-900">{nights * pricePerNight} EUR</span>
+                  </div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-gray-700">Úklid (jednorázově):</span>
+                    <span className="font-bold text-gray-900">80 EUR</span>
                   </div>
                   <div className="border-t border-gray-300 my-3"></div>
                   <div className="flex justify-between items-center">

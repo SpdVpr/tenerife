@@ -5,50 +5,50 @@ const features = [
     icon: Users,
     title: 'Střešní bazén',
     description: 'Exkluzivně pro rezidenty s výhledem na útes',
-    color: 'bg-blue-500',
+    color: 'bg-primary-blue',
   },
   {
     icon: Home,
     title: 'Velká terasa 27m²',
     description: 'Jihozápadní orientace, ideální pro západy slunce',
-    color: 'bg-cyan-500',
+    color: 'bg-primary-cyan',
   },
   {
     icon: Wind,
     title: 'Klimatizace Daikin',
     description: 'Moderní energeticky úsporný systém',
-    color: 'bg-green-500',
+    color: 'bg-primary-lightBlue',
   },
   {
     icon: Wifi,
     title: 'Wi-Fi zdarma',
     description: 'Vysokorychlostní připojení po celém apartmánu',
-    color: 'bg-purple-500',
+    color: 'bg-primary-blue',
   },
   {
     icon: Waves,
     title: 'Výhled na oceán',
     description: 'Úchvatné panorama na Atlantik',
-    color: 'bg-blue-600',
+    color: 'bg-primary-cyan',
   },
   {
     icon: Star,
     title: 'Plně vybaveno',
     description: 'Myčka, pračka, vše co potřebujete',
-    color: 'bg-yellow-500',
+    color: 'bg-accent-yellow',
   },
 ];
 
 export default function WhyChoose() {
   return (
-    <section id="apartment" className="py-20 bg-gradient-to-b from-white to-gray-50">
+    <section id="apartment" className="py-20 bg-gradient-to-b from-white to-accent-beige">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-primary-blue mb-4">
             Proč si vybrat Cielo Dorado?
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-700 max-w-2xl mx-auto">
             Objevte výhody našeho luxusního apartmánu v srdci Los Gigantes
           </p>
         </div>

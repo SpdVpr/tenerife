@@ -13,14 +13,14 @@ const includedItems = [
 
 export default function Pricing() {
   return (
-    <section id="pricing" className="py-20 bg-gradient-to-b from-gray-50 to-white">
+    <section id="pricing" className="py-20 bg-gradient-to-b from-accent-beige to-white">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+          <h2 className="text-4xl md:text-5xl font-bold text-primary-blue mb-4">
             Ceník
           </h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-700 max-w-2xl mx-auto">
             Transparentní ceny bez skrytých poplatků
           </p>
         </div>
@@ -66,6 +66,19 @@ export default function Pricing() {
                 <Calendar className="w-5 h-5" />
                 <span>Pobyt 10+ nocí</span>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Additional Fee */}
+        <div className="max-w-4xl mx-auto mb-12">
+          <div className="bg-white rounded-2xl shadow-xl p-8 border-2 border-primary-blue/30">
+            <h3 className="text-2xl font-bold text-gray-900 mb-4 text-center">
+              Dodatečný poplatek
+            </h3>
+            <div className="flex items-center justify-between max-w-md mx-auto">
+              <span className="text-lg text-gray-700">Úklid na konci pobytu (jednorázově):</span>
+              <span className="text-3xl font-bold text-primary-blue">80 EUR</span>
             </div>
           </div>
         </div>

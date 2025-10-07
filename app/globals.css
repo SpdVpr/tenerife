@@ -28,3 +28,39 @@ h1, h2, h3, h4, h5, h6 {
 .text-balance {
   text-wrap: balance;
 }
+
+/* Travel Theme Animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes rotate-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-rotate-slow {
+  animation: rotate-slow 20s linear infinite;
+}
+
+/* Gradient backgrounds for travel theme */
+.bg-travel-gradient {
+  background: linear-gradient(135deg, #1B5E7E 0%, #2B7FA6 50%, #3A9BC6 100%);
+}
+
+.bg-travel-light {
+  background: linear-gradient(135deg, #F5F1E8 0%, #FFF8E7 100%);
+}

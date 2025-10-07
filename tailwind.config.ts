@@ -9,13 +9,16 @@ const config: Config = {
     extend: {
       colors: {
         primary: {
-          blue: '#2563EB',
-          cyan: '#06B6D4',
+          blue: '#1B5E7E',
+          cyan: '#2B7FA6',
+          lightBlue: '#3A9BC6',
         },
         accent: {
           green: '#10B981',
           red: '#EF4444',
           yellow: '#F59E0B',
+          beige: '#F5F1E8',
+          cream: '#FFF8E7',
         },
       },
       fontFamily: {
