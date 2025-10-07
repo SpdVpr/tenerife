@@ -5,8 +5,8 @@ import Image from 'next/image';
 import { ChevronDown, MapPin, Star } from 'lucide-react';
 
 const heroImages = [
-  '/images/optimized/view/image00010-hero.webp',
   '/images/optimized/view/image00030-hero.webp',
+  '/images/optimized/view/image00010-hero.webp',
   '/images/optimized/view/image00035-hero.webp',
 ];
 
