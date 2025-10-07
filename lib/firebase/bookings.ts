@@ -1,0 +1,259 @@
+import {
+  collection,
+  addDoc,
+  getDocs,
+  getDoc,
+  doc,
+  updateDoc,
+  deleteDoc,
+  query,
+  where,
+  orderBy,
+  Timestamp,
+  DocumentData
+} from 'firebase/firestore';
+import { db } from './config';
+
+export interface BookingData {
+  checkIn: string;
+  checkOut: string;
+  guests: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  message?: string;
+  nights: number;
+  totalPrice: number;
+  pricePerNight: number;
+  status: 'pending' | 'confirmed' | 'cancelled';
+  createdAt: Date;
+}
+
+export interface BookingDocument extends BookingData {
+  id: string;
+}
+
+const BOOKINGS_COLLECTION = 'bookings';
+
+/**
+ * Create a new booking in Firestore
+ */
+export async function createBooking(bookingData: Omit<BookingData, 'createdAt' | 'status'>): Promise<string> {
+  try {
+    const booking: BookingData = {
+      ...bookingData,
+      status: 'pending',
+      createdAt: new Date(),
+    };
+
+    const docRef = await addDoc(collection(db, BOOKINGS_COLLECTION), {
+      ...booking,
+      createdAt: Timestamp.fromDate(booking.createdAt),
+    });
+
+    console.log('Booking created with ID:', docRef.id);
+    return docRef.id;
+  } catch (error) {
+    console.error('Error creating booking:', error);
+    throw new Error('Failed to create booking');
+  }
+}
+
+/**
+ * Get all bookings
+ */
+export async function getAllBookings(): Promise<BookingDocument[]> {
+  try {
+    const q = query(
+      collection(db, BOOKINGS_COLLECTION),
+      orderBy('createdAt', 'desc')
+    );
+    
+    const querySnapshot = await getDocs(q);
+    const bookings: BookingDocument[] = [];
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data() as DocumentData;
+      bookings.push({
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate() || new Date(),
+      } as BookingDocument);
+    });
+
+    return bookings;
+  } catch (error) {
+    console.error('Error getting bookings:', error);
+    throw new Error('Failed to get bookings');
+  }
+}
+
+/**
+ * Get bookings by date range (for checking availability)
+ */
+export async function getBookingsByDateRange(startDate: string, endDate: string): Promise<BookingDocument[]> {
+  try {
+    // Get all non-cancelled bookings and filter in memory
+    // This avoids complex Firestore queries that require indexes
+    const q = query(
+      collection(db, BOOKINGS_COLLECTION),
+      where('status', '!=', 'cancelled')
+    );
+
+    const querySnapshot = await getDocs(q);
+    const bookings: BookingDocument[] = [];
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data() as DocumentData;
+      const booking = {
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate() || new Date(),
+      } as BookingDocument;
+
+      // Check if booking overlaps with the requested date range
+      // Overlap occurs if: booking.checkIn <= endDate AND booking.checkOut >= startDate
+      if (booking.checkIn <= endDate && booking.checkOut >= startDate) {
+        bookings.push(booking);
+      }
+    });
+
+    return bookings;
+  } catch (error) {
+    console.error('Error getting bookings by date range:', error);
+    throw new Error('Failed to check availability');
+  }
+}
+
+/**
+ * Check if dates are available
+ */
+export async function checkAvailability(checkIn: string, checkOut: string): Promise<boolean> {
+  try {
+    const bookings = await getBookingsByDateRange(checkIn, checkOut);
+    return bookings.length === 0;
+  } catch (error) {
+    console.error('Error checking availability:', error);
+    return false;
+  }
+}
+
+/**
+ * Get bookings by email
+ */
+export async function getBookingsByEmail(email: string): Promise<BookingDocument[]> {
+  try {
+    const q = query(
+      collection(db, BOOKINGS_COLLECTION),
+      where('email', '==', email),
+      orderBy('createdAt', 'desc')
+    );
+
+    const querySnapshot = await getDocs(q);
+    const bookings: BookingDocument[] = [];
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data() as DocumentData;
+      bookings.push({
+        id: doc.id,
+        ...data,
+        createdAt: data.createdAt?.toDate() || new Date(),
+      } as BookingDocument);
+    });
+
+    return bookings;
+  } catch (error) {
+    console.error('Error getting bookings by email:', error);
+    throw new Error('Failed to get bookings');
+  }
+}
+
+/**
+ * Get all occupied dates (for calendar display)
+ */
+export async function getOccupiedDates(): Promise<string[]> {
+  try {
+    const q = query(
+      collection(db, BOOKINGS_COLLECTION),
+      where('status', '!=', 'cancelled')
+    );
+
+    const querySnapshot = await getDocs(q);
+    const occupiedDates: Set<string> = new Set();
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data() as DocumentData;
+      const checkIn = new Date(data.checkIn);
+      const checkOut = new Date(data.checkOut);
+
+      // Add all dates between checkIn and checkOut (inclusive)
+      const currentDate = new Date(checkIn);
+      while (currentDate <= checkOut) {
+        occupiedDates.add(currentDate.toISOString().split('T')[0]);
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+    });
+
+    return Array.from(occupiedDates);
+  } catch (error) {
+    console.error('Error getting occupied dates:', error);
+    return [];
+  }
+}
+
+/**
+ * Update booking status
+ */
+export async function updateBookingStatus(
+  bookingId: string,
+  status: 'pending' | 'confirmed' | 'cancelled'
+): Promise<void> {
+  try {
+    const bookingRef = doc(db, BOOKINGS_COLLECTION, bookingId);
+    await updateDoc(bookingRef, { status });
+    console.log('Booking status updated:', bookingId, status);
+  } catch (error) {
+    console.error('Error updating booking status:', error);
+    throw new Error('Failed to update booking status');
+  }
+}
+
+/**
+ * Delete booking
+ */
+export async function deleteBooking(bookingId: string): Promise<void> {
+  try {
+    const bookingRef = doc(db, BOOKINGS_COLLECTION, bookingId);
+    await deleteDoc(bookingRef);
+    console.log('Booking deleted:', bookingId);
+  } catch (error) {
+    console.error('Error deleting booking:', error);
+    throw new Error('Failed to delete booking');
+  }
+}
+
+/**
+ * Get single booking by ID
+ */
+export async function getBookingById(bookingId: string): Promise<BookingDocument | null> {
+  try {
+    const bookingRef = doc(db, BOOKINGS_COLLECTION, bookingId);
+    const bookingSnap = await getDoc(bookingRef);
+
+    if (bookingSnap.exists()) {
+      const data = bookingSnap.data() as DocumentData;
+      return {
+        id: bookingSnap.id,
+        ...data,
+        createdAt: data.createdAt?.toDate() || new Date(),
+      } as BookingDocument;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Error getting booking:', error);
+    throw new Error('Failed to get booking');
+  }
+}
+
