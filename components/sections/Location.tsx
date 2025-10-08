@@ -3,14 +3,14 @@ import { MapPin, Utensils, Ship, Mountain, Waves, ShoppingBag } from 'lucide-rea
 const nearbyPlaces = [
   {
     icon: Waves,
-    title: 'Pláž Los Gigantes',
-    distance: '5 min pěšky',
+    title: 'Pláž Playa de Santiago',
+    distance: '15 min pěšky',
     description: 'Krásná černá sopečná pláž s klidným mořem',
   },
   {
     icon: Ship,
     title: 'Přístav',
-    distance: '3 min pěšky',
+    distance: '15 min pěšky',
     description: 'Výlety lodí, pozorování velryb a delfínů',
   },
   {
@@ -22,20 +22,20 @@ const nearbyPlaces = [
   {
     icon: Utensils,
     title: 'Restaurace a bary',
-    distance: '2-5 min pěšky',
-    description: 'Široká nabídka místních i mezinárodních restaurací',
+    distance: '5 min pěšky',
+    description: 'Jedna restaurace je přímo v přízemí budovy, další pár minut chůze',
   },
   {
     icon: ShoppingBag,
     title: 'Obchody',
-    distance: '3 min pěšky',
+    distance: '5 min pěšky',
     description: 'Supermarkety, lékárna, bankomaty',
   },
   {
     icon: MapPin,
-    title: 'Centrum Puerto Santiago',
+    title: 'Puerto Santiago',
     distance: '10 min autem',
-    description: 'Větší nákupní centrum a další služby',
+    description: 'Menší centrum kolem hlavní ulice Avenida Marítima, restaurace, kavárny, bary a supermarkety',
   },
 ];
 
@@ -114,7 +114,7 @@ export default function Location() {
                     Adresa apartmánu
                   </h3>
                   <p className="text-gray-700 text-sm leading-relaxed">
-                    Colonial 1 Apartment<br />
+                    Colonial Parque<br />
                     Av. Jose Gonzalez Forte, 73<br />
                     38683 Santiago del Teide<br />
                     Santa Cruz de Tenerife, Španělsko
