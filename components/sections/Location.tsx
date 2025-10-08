@@ -118,7 +118,7 @@ export default function Location() {
                     {t('location.mapTitle')}
                   </h3>
                   <p className="text-gray-700 text-sm leading-relaxed">
-                    Colonial 1 Apartment<br />
+                    Colonial Parque<br />
                     Av. Jose Gonzalez Forte, 73<br />
                     38683 Santiago del Teide<br />
                     Santa Cruz de Tenerife, {t('location.mapTitle')}
