@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Lock, User, Eye, EyeOff } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function AdminLoginPage() {
   const [username, setUsername] = useState('');
@@ -32,7 +33,7 @@ export default function AdminLoginPage() {
       } else {
         setError('Nesprávné přihlašovací údaje');
       }
-    } catch (err) {
+    } catch {
       setError('Chyba při přihlašování');
     } finally {
       setIsLoading(false);
@@ -127,12 +128,12 @@ export default function AdminLoginPage() {
 
         {/* Back to Home */}
         <div className="mt-6 text-center">
-          <a
+          <Link
             href="/"
             className="text-primary-blue hover:text-primary-cyan transition-colors"
           >
             ← Zpět na hlavní stránku
-          </a>
+          </Link>
         </div>
       </div>
     </div>
