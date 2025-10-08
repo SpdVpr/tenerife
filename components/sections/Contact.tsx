@@ -1,16 +1,21 @@
+'use client';
+
 import { Phone, Mail, MessageCircle } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Contact() {
+  const { t } = useLanguage();
+
   return (
     <section id="contact" className="py-20 bg-gradient-to-b from-white to-accent-beige">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-primary-blue mb-4">
-            Kontakt
+            {t('contact.title')}
           </h2>
           <p className="text-xl text-gray-700 max-w-2xl mx-auto">
-            Máte dotazy? Rádi vám pomůžeme s rezervací nebo poskytneme další informace
+            {t('contact.subtitle')}
           </p>
         </div>
 
@@ -25,13 +30,13 @@ export default function Contact() {
                 <Phone className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Telefon
+                {t('contact.phone')}
               </h3>
               <p className="text-primary-blue font-semibold text-lg">
                 +420 723 382 745
               </p>
               <p className="text-gray-600 text-sm mt-2">
-                Martin Holann
+                {t('contact.owner')}
               </p>
             </div>
           </a>
@@ -46,13 +51,13 @@ export default function Contact() {
                 <Mail className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">
-                Email
+                {t('contact.email')}
               </h3>
               <p className="text-primary-blue font-semibold text-lg break-all">
                 martin.holann@gmail.com
               </p>
               <p className="text-gray-600 text-sm mt-2">
-                Odpovídáme do 24 hodin
+                {t('contact.response24h')}
               </p>
             </div>
           </a>
@@ -69,13 +74,13 @@ export default function Contact() {
                 <MessageCircle className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">
-                WhatsApp
+                {t('contact.whatsapp')}
               </h3>
               <p className="text-primary-blue font-semibold text-lg">
                 +420 723 382 745
               </p>
               <p className="text-gray-600 text-sm mt-2">
-                Nejrychlejší odpověď
+                {t('contact.fastestResponse')}
               </p>
             </div>
           </a>
@@ -85,16 +90,16 @@ export default function Contact() {
         <div className="text-center mt-12">
           <div className="inline-block bg-gradient-to-br from-primary-blue/10 to-primary-cyan/10 rounded-2xl p-8">
             <h3 className="text-2xl font-bold text-gray-900 mb-3">
-              Připraveni rezervovat?
+              {t('contact.readyToBook')}
             </h3>
             <p className="text-gray-700 mb-6">
-              Kontaktujte nás ještě dnes a zajistěte si svůj vysněný pobyt na Tenerife
+              {t('contact.readyDesc')}
             </p>
             <a
               href="#booking"
               className="inline-block bg-gradient-to-r from-primary-blue to-primary-cyan text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-xl transform hover:-translate-y-1 transition-all"
             >
-              Rezervovat apartmán
+              {t('contact.bookApartment')}
             </a>
           </div>
         </div>

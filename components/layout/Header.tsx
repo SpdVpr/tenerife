@@ -4,21 +4,23 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const navigation = [
-  { name: 'Domů', href: '/', isAnchor: false },
-  { name: 'Apartmán', href: '/#apartment', isAnchor: false },
-  { name: 'Galerie', href: '/#gallery', isAnchor: false },
-  { name: 'Ceník', href: '/#pricing', isAnchor: false },
-  { name: 'Rezervace', href: '/#booking', isAnchor: false },
-  { name: 'Lokalita', href: '/#location', isAnchor: false },
-  { name: 'Guest Book', href: '/guest-book', isAnchor: false },
-  { name: 'Kontakt', href: '/#contact', isAnchor: false },
+  { key: 'nav.home', href: '/', isAnchor: false },
+  { key: 'nav.apartment', href: '/#apartment', isAnchor: false },
+  { key: 'nav.gallery', href: '/#gallery', isAnchor: false },
+  { key: 'nav.pricing', href: '/#pricing', isAnchor: false },
+  { key: 'nav.booking', href: '/#booking', isAnchor: false },
+  { key: 'nav.location', href: '/#location', isAnchor: false },
+  { key: 'nav.guestbook', href: '/guest-book', isAnchor: false },
+  { key: 'nav.contact', href: '/#contact', isAnchor: false },
 ];
 
 export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { language, setLanguage, t } = useLanguage();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -62,11 +64,11 @@ export default function Header() {
           <nav className="hidden lg:flex items-center space-x-8">
             {navigation.map((item) => (
               <a
-                key={item.name}
+                key={item.key}
                 href={item.href}
                 className="text-sm font-medium text-gray-700 transition-colors hover:text-primary-cyan cursor-pointer"
               >
-                {item.name}
+                {t(item.key)}
               </a>
             ))}
           </nav>
@@ -75,10 +77,24 @@ export default function Header() {
           <div className="flex items-center space-x-4">
             {/* Language Switcher */}
             <div className="hidden md:flex items-center space-x-2">
-              <button className="px-3 py-1 text-sm font-medium bg-primary-blue text-white rounded transition-colors">
+              <button
+                onClick={() => setLanguage('cs')}
+                className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
+                  language === 'cs'
+                    ? 'bg-primary-blue text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
                 CZ
               </button>
-              <button className="px-3 py-1 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded transition-colors">
+              <button
+                onClick={() => setLanguage('en')}
+                className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
+                  language === 'en'
+                    ? 'bg-primary-blue text-white'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
                 EN
               </button>
             </div>
@@ -103,19 +119,33 @@ export default function Header() {
             <nav className="flex flex-col space-y-2">
               {navigation.map((item) => (
                 <a
-                  key={item.name}
+                  key={item.key}
                   href={item.href}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="px-4 py-2 text-gray-700 hover:bg-gray-100 hover:text-primary-blue transition-colors cursor-pointer"
                 >
-                  {item.name}
+                  {t(item.key)}
                 </a>
               ))}
               <div className="flex items-center space-x-2 px-4 pt-2 border-t">
-                <button className="flex-1 px-3 py-2 text-sm font-medium bg-primary-blue text-white rounded">
+                <button
+                  onClick={() => setLanguage('cs')}
+                  className={`flex-1 px-3 py-2 text-sm font-medium rounded ${
+                    language === 'cs'
+                      ? 'bg-primary-blue text-white'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
                   CZ
                 </button>
-                <button className="flex-1 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded">
+                <button
+                  onClick={() => setLanguage('en')}
+                  className={`flex-1 px-3 py-2 text-sm font-medium rounded ${
+                    language === 'en'
+                      ? 'bg-primary-blue text-white'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
                   EN
                 </button>
               </div>

@@ -1,33 +1,37 @@
+'use client';
+
 import { Users, Bed, Sofa, Bath, ChefHat, Palmtree, Maximize2, Building2, Wind, Wifi, Tv, UtensilsCrossed, WashingMachine, Shirt, Wind as Dryer, Sparkles, Coffee, Zap, Waves } from 'lucide-react';
 import Image from 'next/image';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const specifications = [
-  { label: 'Kapacita', value: 'Až 4 osoby', icon: Users },
-  { label: 'Ložnice', value: '1 ložnice s manželskou postelí', icon: Bed },
-  { label: 'Obývací pokoj', value: 'Rozkládací gauč pro 2 osoby', icon: Sofa },
-  { label: 'Koupelna', value: 'Moderní koupelna se sprchovým koutem', icon: Bath },
-  { label: 'Kuchyň', value: 'Plně vybavená kuchyňská linka', icon: ChefHat },
-  { label: 'Terasa', value: '27 m² s výhledem na oceán', icon: Palmtree },
-  { label: 'Plocha', value: '47 m² + terasa 27 m²', icon: Maximize2 },
-  { label: 'Patro', value: '2. patro s výtahem', icon: Building2 },
+  { labelKey: 'details.capacity', valueKey: 'details.capacityValue', icon: Users },
+  { labelKey: 'details.bedroom', valueKey: 'details.bedroomValue', icon: Bed },
+  { labelKey: 'details.livingRoom', valueKey: 'details.livingRoomValue', icon: Sofa },
+  { labelKey: 'details.bathroom', valueKey: 'details.bathroomValue', icon: Bath },
+  { labelKey: 'details.kitchen', valueKey: 'details.kitchenValue', icon: ChefHat },
+  { labelKey: 'details.terrace', valueKey: 'details.terraceValue', icon: Palmtree },
+  { labelKey: 'details.area', valueKey: 'details.areaValue', icon: Maximize2 },
+  { labelKey: 'details.floor', valueKey: 'details.floorValue', icon: Building2 },
 ];
 
 const amenities = [
-  { name: 'Klimatizace Daikin (chlazení i topení)', icon: Wind },
-  { name: 'Wi-Fi zdarma (vysokorychlostní)', icon: Wifi },
-  { name: 'Smart TV s Netflix', icon: Tv },
-  { name: 'Plně vybavená kuchyň (myčka, trouba, mikrovlnka)', icon: UtensilsCrossed },
-  { name: 'Pračka', icon: WashingMachine },
-  { name: 'Žehlička a žehlicí prkno', icon: Shirt },
-  { name: 'Fén', icon: Dryer },
-  { name: 'Ložní prádlo a ručníky', icon: Sparkles },
-  { name: 'Základní kuchyňské vybavení', icon: UtensilsCrossed },
-  { name: 'Kávovar', icon: Coffee },
-  { name: 'Varná konvice', icon: Zap },
-  { name: 'Toustovač', icon: Zap },
+  { nameKey: 'amenity.ac', icon: Wind },
+  { nameKey: 'amenity.wifi', icon: Wifi },
+  { nameKey: 'amenity.tv', icon: Tv },
+  { nameKey: 'amenity.kitchen', icon: UtensilsCrossed },
+  { nameKey: 'amenity.washer', icon: WashingMachine },
+  { nameKey: 'amenity.iron', icon: Shirt },
+  { nameKey: 'amenity.dryer', icon: Dryer },
+  { nameKey: 'amenity.linens', icon: Sparkles },
+  { nameKey: 'amenity.kitchenBasics', icon: UtensilsCrossed },
+  { nameKey: 'amenity.coffee', icon: Coffee },
+  { nameKey: 'amenity.kettle', icon: Zap },
+  { nameKey: 'amenity.toaster', icon: Zap },
 ];
 
 export default function ApartmentDetails() {
+  const { t } = useLanguage();
   return (
     <section id="details" className="py-20 bg-gradient-to-b from-white via-accent-beige to-white">
       <div className="container mx-auto px-4">
@@ -35,21 +39,21 @@ export default function ApartmentDetails() {
         <div className="text-center mb-16">
           <div className="inline-block mb-4">
             <span className="bg-gradient-to-r from-primary-blue to-primary-cyan text-white px-6 py-2 rounded-full text-sm font-semibold uppercase tracking-wide">
-              Detail Apartmánu
+              {t('details.badge')}
             </span>
           </div>
           <h2 className="text-4xl md:text-6xl font-bold text-primary-blue mb-6">
-            Váš dokonalý domov na dovolené
+            {t('details.title')}
           </h2>
           <p className="text-xl text-gray-700 max-w-3xl mx-auto leading-relaxed">
-            Moderně zařízený apartmán s panoramatickým výhledem, který nabízí vše pro váš komfortní pobyt
+            {t('details.subtitle')}
           </p>
         </div>
 
         {/* Specifications Cards */}
         <div className="mb-16">
           <h3 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Specifikace
+            {t('details.specifications')}
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {specifications.map((spec, index) => {
@@ -63,8 +67,8 @@ export default function ApartmentDetails() {
                     <Icon className="w-7 h-7 text-white" />
                   </div>
                   <div className="text-center">
-                    <div className="font-bold text-gray-900 text-lg mb-2">{spec.label}</div>
-                    <div className="text-gray-600 text-sm leading-relaxed">{spec.value}</div>
+                    <div className="font-bold text-gray-900 text-lg mb-2">{t(spec.labelKey)}</div>
+                    <div className="text-gray-600 text-sm leading-relaxed">{t(spec.valueKey)}</div>
                   </div>
                 </div>
               );
@@ -75,7 +79,7 @@ export default function ApartmentDetails() {
         {/* Amenities Section */}
         <div className="mb-16">
           <h3 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-            Vybavení apartmánu
+            {t('details.amenities')}
           </h3>
           <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 border border-gray-100">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -89,7 +93,7 @@ export default function ApartmentDetails() {
                     <div className="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-primary-blue to-primary-cyan rounded-lg flex items-center justify-center">
                       <Icon className="w-5 h-5 text-white" />
                     </div>
-                    <span className="text-gray-700 font-medium">{amenity.name}</span>
+                    <span className="text-gray-700 font-medium">{t(amenity.nameKey)}</span>
                   </div>
                 );
               })}
@@ -104,7 +108,7 @@ export default function ApartmentDetails() {
             <div className="relative h-64 lg:h-auto">
               <Image
                 src="/images/optimized/view/image00030-medium.webp"
-                alt="Střešní bazén s výhledem na oceán"
+                alt={t('details.poolTitle')}
                 fill
                 className="object-cover"
                 sizes="(max-width: 1024px) 100vw, 50vw"
@@ -119,15 +123,13 @@ export default function ApartmentDetails() {
                 </div>
               </div>
               <h3 className="text-3xl md:text-4xl font-bold mb-6">
-                Střešní bazén a společné prostory
+                {t('details.poolTitle')}
               </h3>
               <p className="text-lg md:text-xl leading-relaxed mb-6 text-white/90">
-                Apartmán je součástí rezidenčního komplexu Colonial Parque s exkluzivním střešním bazénem
-                pouze pro rezidenty. Bazén nabízí úchvatný výhled na útes Los Gigantes a Atlantský oceán.
+                {t('details.poolDesc1')}
               </p>
               <p className="text-lg leading-relaxed text-white/90">
-                K dispozici jsou také lehátka a sprchy. Ideální místo pro relaxaci
-                a odpočinek po dni stráveném objevováním ostrova.
+                {t('details.poolDesc2')}
               </p>
             </div>
           </div>

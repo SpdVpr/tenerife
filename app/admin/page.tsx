@@ -7,9 +7,10 @@ import {
   updateBookingStatus,
   deleteBooking
 } from '@/lib/firebase/bookings';
-import { Calendar, Users, Mail, Phone, Clock, Euro, Loader2, Check, X, Trash2, RefreshCw } from 'lucide-react';
+import { Calendar, Users, Mail, Phone, Clock, Euro, Loader2, Check, X, Trash2, RefreshCw, LogOut } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import { useRouter } from 'next/navigation';
 
 // Disable static generation for this page
 export const dynamic = 'force-dynamic';
@@ -18,6 +19,7 @@ export default function AdminPage() {
   const [bookings, setBookings] = useState<BookingDocument[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
     loadBookings();
@@ -89,6 +91,15 @@ export default function AdminPage() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/admin/logout', { method: 'POST' });
+      router.push('/admin/login');
+    } catch (err) {
+      console.error('Error logging out:', err);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -104,14 +115,23 @@ export default function AdminPage() {
                 Přehled všech rezervací apartmánu Cielo Dorado
               </p>
             </div>
-            <button
-              onClick={loadBookings}
-              disabled={isLoading}
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={loadBookings}
+                disabled={isLoading}
               className="flex items-center gap-2 px-4 py-2 bg-primary-blue text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
             >
               <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
               Obnovit
             </button>
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                <LogOut className="w-5 h-5" />
+                Odhlásit se
+              </button>
+            </div>
           </div>
 
           {/* Loading State */}

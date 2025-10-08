@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { ChevronDown, MapPin, Star } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const heroImages = [
   '/images/optimized/view/image00030-hero.webp',
@@ -12,6 +13,7 @@ const heroImages = [
 
 export default function Hero() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -54,17 +56,17 @@ export default function Hero() {
           {/* Badge */}
           <div className="inline-flex items-center space-x-2 bg-white/30 backdrop-blur-md px-6 py-3 rounded-full mb-8 animate-fade-in shadow-2xl border border-white/20">
             <Star className="w-6 h-6 text-yellow-400 fill-yellow-400 drop-shadow-lg" />
-            <span className="text-base md:text-lg font-semibold text-white drop-shadow-lg">Premium Apartmán na Tenerife</span>
+            <span className="text-base md:text-lg font-semibold text-white drop-shadow-lg">{t('hero.badge')}</span>
           </div>
 
           {/* Main Heading */}
           <h1 className="text-6xl md:text-8xl font-extrabold mb-6 animate-slide-up drop-shadow-2xl" style={{ textShadow: '0 4px 20px rgba(0,0,0,0.8)' }}>
-            Cielo Dorado
+            {t('hero.title')}
           </h1>
 
           {/* Subheading */}
           <p className="text-2xl md:text-4xl mb-8 animate-slide-up animation-delay-100 font-bold drop-shadow-2xl" style={{ textShadow: '0 2px 15px rgba(0,0,0,0.8)' }}>
-            Váš dokonalý únik na Tenerife
+            {t('hero.subtitle')}
           </p>
 
 
@@ -72,7 +74,7 @@ export default function Hero() {
           {/* Address */}
           <div className="flex items-center justify-center space-x-3 mb-10 animate-slide-up animation-delay-300 bg-white/20 backdrop-blur-md px-6 py-3 rounded-full inline-flex shadow-xl border border-white/20">
             <MapPin className="w-6 h-6 drop-shadow-lg" />
-            <span className="text-lg font-semibold drop-shadow-lg">Los Gigantes, Puerto de Santiago, Tenerife</span>
+            <span className="text-lg font-semibold drop-shadow-lg">{t('hero.location')}</span>
           </div>
 
           {/* CTA Buttons */}
@@ -81,13 +83,13 @@ export default function Hero() {
               onClick={scrollToBooking}
               className="px-10 py-5 bg-gradient-to-r from-primary-blue to-primary-cyan text-white font-bold text-lg rounded-xl hover:shadow-2xl transition-all transform hover:scale-105 hover:-translate-y-2 shadow-xl"
             >
-              Rezervovat nyní
+              {t('hero.bookNow')}
             </button>
             <button
               onClick={() => document.getElementById('gallery')?.scrollIntoView({ behavior: 'smooth' })}
               className="px-10 py-5 bg-white/30 backdrop-blur-md text-white font-bold text-lg rounded-xl hover:bg-white/40 transition-all border-2 border-white/40 shadow-xl hover:shadow-2xl transform hover:-translate-y-1"
             >
-              Shlédnout galerii
+              {t('hero.viewGallery')}
             </button>
           </div>
 

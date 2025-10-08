@@ -4,8 +4,10 @@ import { useState } from 'react';
 import { Calendar, Users, Mail, Phone, User, MessageSquare, CreditCard, Check, Loader2, Info } from 'lucide-react';
 import { createBooking, checkAvailability } from '@/lib/firebase/bookings';
 import AvailabilityCalendar from '@/components/ui/AvailabilityCalendar';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 export default function Booking() {
+  const { t } = useLanguage();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     checkIn: '',
@@ -48,7 +50,7 @@ export default function Booking() {
       try {
         const isAvailable = await checkAvailability(checkIn, checkOut);
         if (!isAvailable) {
-          setAvailabilityError('Tyto termíny jsou již obsazené. Prosím vyberte jiné datum.');
+          setAvailabilityError(t('booking.notAvailable'));
         }
       } catch (error) {
         console.error('Error checking availability:', error);
@@ -80,7 +82,7 @@ export default function Booking() {
       const isAvailable = await checkAvailability(formData.checkIn, formData.checkOut);
 
       if (!isAvailable) {
-        setAvailabilityError('Tyto termíny jsou již obsazené. Prosím vyberte jiné datum.');
+        setAvailabilityError(t('booking.notAvailable'));
         setStep(1);
         setIsLoading(false);
         return;
@@ -141,10 +143,10 @@ export default function Booking() {
         {/* Section Header */}
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold text-primary-blue mb-4">
-            Rezervace
+            {t('booking.title')}
           </h2>
           <p className="text-xl text-gray-700 max-w-2xl mx-auto">
-            Vyplňte formulář a my vás budeme kontaktovat pro potvrzení rezervace
+            {t('booking.subtitle')}
           </p>
         </div>
 
@@ -164,9 +166,9 @@ export default function Booking() {
                     {step > stepNumber ? <Check className="w-6 h-6" /> : stepNumber}
                   </div>
                   <span className="text-sm mt-2 font-medium text-gray-700">
-                    {stepNumber === 1 && 'Termín'}
-                    {stepNumber === 2 && 'Údaje'}
-                    {stepNumber === 3 && 'Shrnutí'}
+                    {stepNumber === 1 && t('booking.step1')}
+                    {stepNumber === 2 && t('booking.step2')}
+                    {stepNumber === 3 && t('booking.step3')}
                   </span>
                 </div>
                 {stepNumber < 3 && (
@@ -187,7 +189,7 @@ export default function Booking() {
           {step === 1 && (
             <div className="bg-white rounded-2xl shadow-xl p-8 animate-fade-in">
               <h3 className="text-2xl font-bold text-gray-900 mb-6">
-                Vyberte termín pobytu
+                {t('booking.selectDates')}
               </h3>
 
               {/* Calendar */}
@@ -205,13 +207,13 @@ export default function Booking() {
               {/* Manual Date Input (optional) */}
               <div className="mb-6">
                 <p className="text-sm text-gray-600 mb-3 text-center">
-                  Nebo zadejte datum ručně:
+                  {t('booking.orManual')}
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       <Calendar className="w-4 h-4 inline mr-2" />
-                      Příjezd
+                      {t('booking.checkIn')}
                     </label>
                     <input
                       type="date"
@@ -227,7 +229,7 @@ export default function Booking() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       <Calendar className="w-4 h-4 inline mr-2" />
-                      Odjezd
+                      {t('booking.checkOut')}
                     </label>
                     <input
                       type="date"
@@ -246,7 +248,7 @@ export default function Booking() {
               {isCheckingAvailability && (
                 <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-center">
                   <Loader2 className="w-5 h-5 text-primary-blue animate-spin mr-3" />
-                  <span className="text-blue-700">Kontroluji dostupnost...</span>
+                  <span className="text-blue-700">{t('booking.checkingAvailability')}</span>
                 </div>
               )}
 
@@ -260,7 +262,7 @@ export default function Booking() {
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <Users className="w-4 h-4 inline mr-2" />
-                  Počet hostů
+                  {t('booking.guests')}
                 </label>
                 <select
                   name="guests"
@@ -268,39 +270,39 @@ export default function Booking() {
                   onChange={handleInputChange}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent"
                 >
-                  <option value={1}>1 osoba</option>
-                  <option value={2}>2 osoby</option>
-                  <option value={3}>3 osoby</option>
-                  <option value={4}>4 osoby</option>
+                  <option value={1}>{t('booking.guest1')}</option>
+                  <option value={2}>{t('booking.guest2')}</option>
+                  <option value={3}>{t('booking.guest3')}</option>
+                  <option value={4}>{t('booking.guest4')}</option>
                 </select>
               </div>
 
               {nights > 0 && (
                 <div className="bg-gradient-to-br from-primary-blue/10 to-primary-cyan/10 rounded-lg p-6 mb-6">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-700">Počet nocí:</span>
+                    <span className="text-gray-700">{t('booking.nights')}</span>
                     <span className="font-bold text-gray-900">{nights}</span>
                   </div>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-700">Cena za noc:</span>
+                    <span className="text-gray-700">{t('booking.pricePerNight')}</span>
                     <span className="font-bold text-gray-900">{nights >= 10 ? '85' : '95'} EUR</span>
                   </div>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-700">Ubytování celkem:</span>
+                    <span className="text-gray-700">{t('booking.accommodation')}</span>
                     <span className="font-bold text-gray-900">{nights * pricePerNight} EUR</span>
                   </div>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-700">Úklid (jednorázově):</span>
+                    <span className="text-gray-700">{t('booking.cleaning')}</span>
                     <span className="font-bold text-gray-900">80 EUR</span>
                   </div>
                   <div className="border-t border-gray-300 my-3"></div>
                   <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold text-gray-900">Celková cena:</span>
+                    <span className="text-lg font-bold text-gray-900">{t('booking.totalPrice')}</span>
                     <span className="text-2xl font-bold text-primary-blue">{totalPrice} EUR</span>
                   </div>
                   {nights >= 10 && (
                     <p className="text-sm text-accent-green mt-2">
-                      ✓ Sleva 10% za pobyt delší než 10 nocí
+                      {t('booking.discount10')}
                     </p>
                   )}
                 </div>
@@ -309,7 +311,7 @@ export default function Booking() {
               {nights > 0 && nights < 5 && (
                 <div className="bg-accent-red/10 border border-accent-red/30 rounded-lg p-4 mb-6">
                   <p className="text-accent-red font-medium">
-                    Minimální délka pobytu je 5 nocí. Prosím vyberte delší období.
+                    {t('booking.minStayWarning')}
                   </p>
                 </div>
               )}
@@ -320,7 +322,7 @@ export default function Booking() {
                 disabled={!canProceedToStep2}
                 className="w-full bg-gradient-to-r from-primary-blue to-primary-cyan text-white py-4 rounded-lg font-semibold hover:shadow-xl transform hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
               >
-                Pokračovat
+                {t('booking.continue')}
               </button>
             </div>
           )}
@@ -329,14 +331,14 @@ export default function Booking() {
           {step === 2 && (
             <div className="bg-white rounded-2xl shadow-xl p-8 animate-fade-in">
               <h3 className="text-2xl font-bold text-gray-900 mb-6">
-                Kontaktní údaje
+                {t('booking.contactDetails')}
               </h3>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     <User className="w-4 h-4 inline mr-2" />
-                    Jméno *
+                    {t('booking.firstName')} *
                   </label>
                   <input
                     type="text"
@@ -351,7 +353,7 @@ export default function Booking() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     <User className="w-4 h-4 inline mr-2" />
-                    Příjmení *
+                    {t('booking.lastName')} *
                   </label>
                   <input
                     type="text"
@@ -367,7 +369,7 @@ export default function Booking() {
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <Mail className="w-4 h-4 inline mr-2" />
-                  Email *
+                  {t('booking.email')} *
                 </label>
                 <input
                   type="email"
@@ -382,7 +384,7 @@ export default function Booking() {
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <Phone className="w-4 h-4 inline mr-2" />
-                  Telefon *
+                  {t('booking.phone')} *
                 </label>
                 <input
                   type="tel"
@@ -398,14 +400,14 @@ export default function Booking() {
               <div className="mb-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   <MessageSquare className="w-4 h-4 inline mr-2" />
-                  Zpráva (volitelné)
+                  {t('booking.message')}
                 </label>
                 <textarea
                   name="message"
                   value={formData.message}
                   onChange={handleInputChange}
                   rows={4}
-                  placeholder="Máte nějaké speciální požadavky nebo dotazy?"
+                  placeholder={t('booking.messagePlaceholder')}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent"
                 />
               </div>
@@ -416,7 +418,7 @@ export default function Booking() {
                   onClick={() => setStep(1)}
                   className="flex-1 bg-gray-200 text-gray-700 py-4 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
                 >
-                  Zpět
+                  {t('booking.back')}
                 </button>
                 <button
                   type="button"
@@ -424,7 +426,7 @@ export default function Booking() {
                   disabled={!canProceedToStep3}
                   className="flex-1 bg-gradient-to-r from-primary-blue to-primary-cyan text-white py-4 rounded-lg font-semibold hover:shadow-xl transform hover:-translate-y-1 transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                 >
-                  Pokračovat
+                  {t('booking.continue')}
                 </button>
               </div>
             </div>
@@ -434,28 +436,28 @@ export default function Booking() {
           {step === 3 && (
             <div className="bg-white rounded-2xl shadow-xl p-8 animate-fade-in">
               <h3 className="text-2xl font-bold text-gray-900 mb-6">
-                Shrnutí rezervace
+                {t('booking.summary')}
               </h3>
 
               <div className="space-y-6 mb-8">
                 {/* Booking Details */}
                 <div className="bg-gray-50 rounded-lg p-6">
-                  <h4 className="font-bold text-gray-900 mb-4">Detail pobytu</h4>
+                  <h4 className="font-bold text-gray-900 mb-4">{t('booking.stayDetails')}</h4>
                   <div className="space-y-2 text-gray-700">
                     <div className="flex justify-between">
-                      <span>Příjezd:</span>
+                      <span>{t('booking.checkIn')}:</span>
                       <span className="font-semibold">{new Date(formData.checkIn).toLocaleDateString('cs-CZ')}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Odjezd:</span>
+                      <span>{t('booking.checkOut')}:</span>
                       <span className="font-semibold">{new Date(formData.checkOut).toLocaleDateString('cs-CZ')}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Počet nocí:</span>
+                      <span>{t('booking.nights')}</span>
                       <span className="font-semibold">{nights}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Počet hostů:</span>
+                      <span>{t('booking.guests')}:</span>
                       <span className="font-semibold">{formData.guests}</span>
                     </div>
                   </div>
@@ -463,18 +465,18 @@ export default function Booking() {
 
                 {/* Guest Details */}
                 <div className="bg-gray-50 rounded-lg p-6">
-                  <h4 className="font-bold text-gray-900 mb-4">Kontaktní údaje</h4>
+                  <h4 className="font-bold text-gray-900 mb-4">{t('booking.contactDetails')}</h4>
                   <div className="space-y-2 text-gray-700">
                     <div className="flex justify-between">
-                      <span>Jméno:</span>
+                      <span>{t('booking.name')}:</span>
                       <span className="font-semibold">{formData.firstName} {formData.lastName}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Email:</span>
+                      <span>{t('booking.email')}:</span>
                       <span className="font-semibold">{formData.email}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Telefon:</span>
+                      <span>{t('booking.phone')}:</span>
                       <span className="font-semibold">{formData.phone}</span>
                     </div>
                   </div>
@@ -484,24 +486,24 @@ export default function Booking() {
                 <div className="bg-gradient-to-br from-primary-blue/10 to-primary-cyan/10 rounded-lg p-6">
                   <h4 className="font-bold text-gray-900 mb-4 flex items-center">
                     <CreditCard className="w-5 h-5 mr-2" />
-                    Platební informace
+                    {t('booking.paymentInfo')}
                   </h4>
                   <div className="space-y-2 text-gray-700 mb-4">
                     <div className="flex justify-between">
-                      <span>Celková cena:</span>
+                      <span>{t('booking.totalPrice')}</span>
                       <span className="font-bold text-xl text-primary-blue">{totalPrice} EUR</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Záloha (50%):</span>
+                      <span>{t('booking.deposit')}:</span>
                       <span className="font-semibold">{totalPrice / 2} EUR</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Zbývá zaplatit:</span>
+                      <span>{t('booking.remaining')}:</span>
                       <span className="font-semibold">{totalPrice / 2} EUR</span>
                     </div>
                   </div>
                   <p className="text-sm text-gray-600">
-                    Záloha 50% je splatná při potvrzení rezervace. Zbývajících 50% je splatných měsíc před příjezdem.
+                    {t('booking.depositInfo')}
                   </p>
                 </div>
               </div>
@@ -513,7 +515,7 @@ export default function Booking() {
                   disabled={isLoading}
                   className="flex-1 bg-gray-200 text-gray-700 py-4 rounded-lg font-semibold hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Zpět
+                  {t('booking.back')}
                 </button>
                 <button
                   type="submit"
@@ -523,12 +525,12 @@ export default function Booking() {
                   {isLoading ? (
                     <>
                       <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                      Odesílám...
+                      {t('booking.submitting')}
                     </>
                   ) : (
                     <>
                       <Check className="w-5 h-5 mr-2" />
-                      Odeslat rezervaci
+                      {t('booking.submit')}
                     </>
                   )}
                 </button>
@@ -544,10 +546,10 @@ export default function Booking() {
                   <Check className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                  Rezervace odeslána!
+                  {t('booking.success')}
                 </h3>
                 <p className="text-gray-600">
-                  Děkujeme za vaši rezervaci. Brzy vás budeme kontaktovat pro potvrzení.
+                  {t('booking.successMessage')}
                 </p>
               </div>
             </div>
@@ -561,11 +563,10 @@ export default function Booking() {
               <CreditCard className="w-8 h-8 text-primary-blue flex-shrink-0" />
               <div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                  Platební podmínky
+                  {t('booking.paymentTerms')}
                 </h3>
                 <p className="text-gray-700 leading-relaxed">
-                  Při rezervaci se platí záloha <strong>50% z celkové ceny</strong>.
-                  Zbývajících 50% je splatných <strong>měsíc před příjezdem</strong>.
+                  {t('booking.paymentTermsDesc')}
                 </p>
               </div>
             </div>
@@ -574,27 +575,27 @@ export default function Booking() {
               <Info className="w-8 h-8 text-primary-blue flex-shrink-0" />
               <div>
                 <h4 className="text-lg font-bold text-gray-900 mb-2">
-                  Minimální délka pobytu
+                  {t('booking.minStayTitle')}
                 </h4>
                 <p className="text-gray-700 leading-relaxed">
-                  Minimální délka rezervace je <strong>5 nocí</strong>.
+                  {t('booking.minStayDesc')}
                 </p>
               </div>
             </div>
 
             <div className="bg-white rounded-lg p-6">
               <h4 className="text-lg font-bold text-gray-900 mb-3">
-                Bankovní spojení pro platbu
+                {t('booking.bankDetails')}
               </h4>
               <div className="space-y-2 text-gray-700">
                 <div className="flex items-center space-x-2">
-                  <span className="font-semibold">IBAN:</span>
+                  <span className="font-semibold">{t('booking.iban')}</span>
                   <code className="bg-gray-100 px-3 py-1 rounded text-sm">
-                    ES5600494166222714041761
+                    {t('booking.ibanNumber')}
                   </code>
                 </div>
                 <p className="text-sm text-gray-600 mt-3">
-                  Do zprávy pro příjemce uveďte prosím číslo vaší rezervace.
+                  {t('booking.paymentNote')}
                 </p>
               </div>
             </div>

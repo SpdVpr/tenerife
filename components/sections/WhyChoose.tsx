@@ -1,55 +1,60 @@
+'use client';
+
 import { Users, Home, Wind, Wifi, Waves, Star } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const features = [
   {
     icon: Users,
-    title: 'Střešní bazén',
-    description: 'Exkluzivně pro rezidenty s výhledem na útes',
+    titleKey: 'why.pool',
+    descKey: 'why.poolDesc',
     color: 'bg-primary-blue',
   },
   {
     icon: Home,
-    title: 'Velká terasa 27m²',
-    description: 'Jihozápadní orientace, ideální pro západy slunce',
+    titleKey: 'why.terrace',
+    descKey: 'why.terraceDesc',
     color: 'bg-primary-cyan',
   },
   {
     icon: Wind,
-    title: 'Klimatizace Daikin',
-    description: 'Moderní energeticky úsporný systém',
+    titleKey: 'why.ac',
+    descKey: 'why.acDesc',
     color: 'bg-primary-lightBlue',
   },
   {
     icon: Wifi,
-    title: 'Wi-Fi zdarma',
-    description: 'Vysokorychlostní připojení po celém apartmánu',
+    titleKey: 'why.wifi',
+    descKey: 'why.wifiDesc',
     color: 'bg-primary-blue',
   },
   {
     icon: Waves,
-    title: 'Výhled na oceán',
-    description: 'Úchvatné panorama na Atlantik',
+    titleKey: 'why.view',
+    descKey: 'why.viewDesc',
     color: 'bg-primary-cyan',
   },
   {
     icon: Star,
-    title: 'Plně vybaveno',
-    description: 'Myčka, pračka, vše co potřebujete',
+    titleKey: 'why.equipped',
+    descKey: 'why.equippedDesc',
     color: 'bg-accent-yellow',
   },
 ];
 
 export default function WhyChoose() {
+  const { t } = useLanguage();
+
   return (
     <section id="apartment" className="py-20 bg-gradient-to-b from-white to-accent-beige">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-primary-blue mb-4">
-            Proč si vybrat Cielo Dorado?
+            {t('why.title')}
           </h2>
           <p className="text-xl text-gray-700 max-w-2xl mx-auto">
-            Objevte výhody našeho luxusního apartmánu v srdci Los Gigantes
+            {t('why.subtitle')}
           </p>
         </div>
 
@@ -71,10 +76,10 @@ export default function WhyChoose() {
 
                 {/* Content */}
                 <h3 className="text-xl font-bold text-gray-900 mb-3">
-                  {feature.title}
+                  {t(feature.titleKey)}
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  {feature.description}
+                  {t(feature.descKey)}
                 </p>
               </div>
             );

@@ -1,55 +1,59 @@
+'use client';
+
 import { MapPin, Utensils, Ship, Mountain, Waves, ShoppingBag } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const nearbyPlaces = [
   {
     icon: Waves,
-    title: 'Pláž Los Gigantes',
-    distance: '5 min pěšky',
-    description: 'Krásná černá sopečná pláž s klidným mořem',
+    titleKey: 'location.beach',
+    distanceKey: 'location.beachDist',
+    descKey: 'location.beachDesc',
   },
   {
     icon: Ship,
-    title: 'Přístav',
-    distance: '3 min pěšky',
-    description: 'Výlety lodí, pozorování velryb a delfínů',
+    titleKey: 'location.port',
+    distanceKey: 'location.portDist',
+    descKey: 'location.portDesc',
   },
   {
     icon: Mountain,
-    title: 'Útes Los Gigantes',
-    distance: 'Přímo před vámi',
-    description: 'Ikonické útesy vysoké až 800 metrů',
+    titleKey: 'location.cliffs',
+    distanceKey: 'location.cliffsDist',
+    descKey: 'location.cliffsDesc',
   },
   {
     icon: Utensils,
-    title: 'Restaurace a bary',
-    distance: '2-5 min pěšky',
-    description: 'Široká nabídka místních i mezinárodních restaurací',
+    titleKey: 'location.restaurants',
+    distanceKey: 'location.restaurantsDist',
+    descKey: 'location.restaurantsDesc',
   },
   {
     icon: ShoppingBag,
-    title: 'Obchody',
-    distance: '3 min pěšky',
-    description: 'Supermarkety, lékárna, bankomaty',
+    titleKey: 'location.shops',
+    distanceKey: 'location.shopsDist',
+    descKey: 'location.shopsDesc',
   },
   {
     icon: MapPin,
-    title: 'Centrum Puerto Santiago',
-    distance: '10 min autem',
-    description: 'Větší nákupní centrum a další služby',
+    titleKey: 'location.center',
+    distanceKey: 'location.centerDist',
+    descKey: 'location.centerDesc',
   },
 ];
 
 export default function Location() {
+  const { t } = useLanguage();
   return (
     <section id="location" className="py-20 bg-white">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold text-primary-blue mb-4">
-            Lokalita
+            {t('location.title')}
           </h2>
           <p className="text-xl text-gray-700 max-w-2xl mx-auto">
-            Los Gigantes - klidné městečko s úchvatným výhledem na útes
+            {t('location.subtitle')}
           </p>
         </div>
 
@@ -68,13 +72,13 @@ export default function Location() {
                   </div>
                   <div className="flex-1">
                     <h3 className="text-lg font-bold text-gray-900 mb-1">
-                      {place.title}
+                      {t(place.titleKey)}
                     </h3>
                     <p className="text-sm text-primary-blue font-semibold mb-2">
-                      {place.distance}
+                      {t(place.distanceKey)}
                     </p>
                     <p className="text-sm text-gray-600">
-                      {place.description}
+                      {t(place.descKey)}
                     </p>
                   </div>
                 </div>
@@ -111,13 +115,13 @@ export default function Location() {
                 <MapPin className="w-6 h-6 text-primary-blue flex-shrink-0 mt-1" />
                 <div>
                   <h3 className="text-lg font-bold text-gray-900 mb-3">
-                    Adresa apartmánu
+                    {t('location.mapTitle')}
                   </h3>
                   <p className="text-gray-700 text-sm leading-relaxed">
                     Colonial 1 Apartment<br />
                     Av. Jose Gonzalez Forte, 73<br />
                     38683 Santiago del Teide<br />
-                    Santa Cruz de Tenerife, Španělsko
+                    Santa Cruz de Tenerife, {t('location.mapTitle')}
                   </p>
                   <a
                     href="https://maps.google.com/?q=Colonial+1+Apartment,+Av.+Jose+Gonzalez+Forte,+73,+38683+Santiago+del+Teide,+Santa+Cruz+de+Tenerife,+Spain"
@@ -125,7 +129,7 @@ export default function Location() {
                     rel="noopener noreferrer"
                     className="inline-flex items-center mt-4 text-primary-blue hover:text-primary-cyan font-semibold transition-colors text-sm"
                   >
-                    Otevřít v Google Maps →
+                    Google Maps →
                   </a>
                 </div>
               </div>
@@ -134,15 +138,13 @@ export default function Location() {
             {/* Why Los Gigantes */}
             <div className="bg-gradient-to-br from-primary-blue/10 to-primary-cyan/10 rounded-2xl p-6 flex-1">
               <h3 className="text-lg font-bold text-gray-900 mb-3">
-                Proč Los Gigantes?
+                {t('location.title')}
               </h3>
               <p className="text-gray-700 text-sm leading-relaxed mb-3">
-                Klidné přímořské městečko na západním pobřeží Tenerife s impozantními útesy
-                vysokými až 800 metrů. Ideální pro klid, relaxaci a autentickou atmosféru.
+                {t('location.subtitle')}
               </p>
               <p className="text-gray-700 text-sm leading-relaxed">
-                Nádherné západy slunce z terasy, restaurace, obchody, pláže a vodní sporty
-                v okolí.
+                {t('location.cliffsDesc')}
               </p>
             </div>
           </div>

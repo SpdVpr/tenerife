@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { LanguageProvider } from "@/contexts/LanguageContext";
 
 export const metadata: Metadata = {
   title: "Cielo Dorado - Luxusní apartmán na Tenerife | Los Gigantes",
@@ -21,7 +22,9 @@ export default function RootLayout({
   return (
     <html lang="cs">
       <body className="antialiased">
-        {children}
+        <LanguageProvider>
+          {children}
+        </LanguageProvider>
       </body>
     </html>
   );

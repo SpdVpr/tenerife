@@ -5,6 +5,7 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { getOccupiedDates } from '@/lib/firebase/bookings';
 import { Loader2 } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 type ValuePiece = Date | null;
 type Value = ValuePiece | [ValuePiece, ValuePiece];
@@ -15,11 +16,12 @@ interface AvailabilityCalendarProps {
   selectedCheckOut?: string;
 }
 
-export default function AvailabilityCalendar({ 
-  onDateSelect, 
-  selectedCheckIn, 
-  selectedCheckOut 
+export default function AvailabilityCalendar({
+  onDateSelect,
+  selectedCheckIn,
+  selectedCheckOut
 }: AvailabilityCalendarProps) {
+  const { language } = useLanguage();
   const [occupiedDates, setOccupiedDates] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [dateRange, setDateRange] = useState<Value>(null);
@@ -120,11 +122,13 @@ export default function AvailabilityCalendar({
     }
   };
 
+  const { t } = useLanguage();
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="w-8 h-8 text-primary-blue animate-spin" />
-        <span className="ml-3 text-gray-600">Načítám dostupnost...</span>
+        <span className="ml-3 text-gray-600">{t('booking.loadingAvailability')}</span>
       </div>
     );
   }
@@ -241,15 +245,15 @@ export default function AvailabilityCalendar({
         <div className="flex items-center justify-center gap-6 text-sm">
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded bg-green-200 border border-green-300"></div>
-            <span className="text-gray-700">Volné</span>
+            <span className="text-gray-700">{t('booking.available')}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded bg-red-200 border border-red-300"></div>
-            <span className="text-gray-700">Obsazené</span>
+            <span className="text-gray-700">{t('booking.occupied')}</span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-4 h-4 rounded bg-blue-500 border border-blue-600"></div>
-            <span className="text-gray-700">Vybrané</span>
+            <span className="text-gray-700">{t('booking.selected')}</span>
           </div>
         </div>
       </div>
@@ -261,7 +265,7 @@ export default function AvailabilityCalendar({
         minDate={new Date()}
         tileClassName={tileClassName}
         tileDisabled={tileDisabled}
-        locale="cs-CZ"
+        locale={language === 'cs' ? 'cs-CZ' : 'en-US'}
         prev2Label={null}
         next2Label={null}
       />
@@ -269,8 +273,8 @@ export default function AvailabilityCalendar({
       {dateRange && Array.isArray(dateRange) && dateRange[0] && dateRange[1] && (
         <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <p className="text-sm text-blue-900">
-            <strong>Vybraný termín:</strong>{' '}
-            {dateRange[0].toLocaleDateString('cs-CZ')} - {dateRange[1].toLocaleDateString('cs-CZ')}
+            <strong>{t('booking.selectedDates')}:</strong>{' '}
+            {dateRange[0].toLocaleDateString(language === 'cs' ? 'cs-CZ' : 'en-US')} - {dateRange[1].toLocaleDateString(language === 'cs' ? 'cs-CZ' : 'en-US')}
           </p>
         </div>
       )}

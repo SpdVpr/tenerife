@@ -3,17 +3,18 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { X, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 const categories = [
-  { id: 'all', name: 'Vše' },
-  { id: 'view', name: 'Výhled' },
-  { id: 'living-room', name: 'Obývací pokoj' },
-  { id: 'bedroom', name: 'Ložnice' },
-  { id: 'kitchen', name: 'Kuchyň' },
-  { id: 'bathroom', name: 'Koupelna' },
-  { id: 'terrace', name: 'Terasa' },
-  { id: 'pool', name: 'Bazén' },
-  { id: 'exterior', name: 'Exteriér' },
+  { id: 'all', nameKey: 'gallery.all' },
+  { id: 'view', nameKey: 'gallery.view' },
+  { id: 'living-room', nameKey: 'gallery.livingRoom' },
+  { id: 'bedroom', nameKey: 'gallery.bedroom' },
+  { id: 'kitchen', nameKey: 'gallery.kitchen' },
+  { id: 'bathroom', nameKey: 'gallery.bathroom' },
+  { id: 'terrace', nameKey: 'gallery.terrace' },
+  { id: 'pool', nameKey: 'gallery.pool' },
+  { id: 'exterior', nameKey: 'gallery.exterior' },
 ];
 
 // Generujeme seznam obrázků na základě optimalizovaných fotek
@@ -68,6 +69,7 @@ const galleryImages = [
 ];
 
 export default function Gallery() {
+  const { t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -115,10 +117,10 @@ export default function Gallery() {
         {/* Section Header */}
         <div className="text-center mb-12">
           <h2 className="text-4xl md:text-5xl font-bold text-primary-blue mb-4">
-            Galerie
+            {t('gallery.title')}
           </h2>
           <p className="text-xl text-gray-700 max-w-2xl mx-auto">
-            Prohlédněte si fotografie apartmánu a okolí
+            {t('gallery.subtitle')}
           </p>
         </div>
 
@@ -134,7 +136,7 @@ export default function Gallery() {
                   : 'bg-white text-gray-700 hover:bg-gray-100 shadow'
               }`}
             >
-              {category.name}
+              {t(category.nameKey)}
             </button>
           ))}
         </div>
