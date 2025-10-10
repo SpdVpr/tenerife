@@ -64,16 +64,16 @@ Po přidání počkejte 5-30 minut na propagaci DNS a ověřte pomocí:
 
 ### 2. Nastavení hesla v .env.local
 
-Otevřete soubor `.env.local` v kořenové složce projektu a **nahraďte** `YOUR_EMAIL_PASSWORD_HERE` skutečným heslem k emailové schránce `info@cielodorado-tenerife.eu`.
+Otevřete soubor `.env.local` v kořenové složce projektu a **nahraďte** placeholdery skutečnými hodnotami.
 
 ```env
-# SMTP Email Configuration (VEDOS/WEDOS)
-SMTP_HOST=wes1-smtp.wedos.net
+# SMTP Email Configuration
+SMTP_HOST=your_smtp_server_here
 SMTP_PORT=587
-SMTP_USER=info@cielodorado-tenerife.eu
-SMTP_PASSWORD=zde_vlozte_skutecne_heslo
-SMTP_FROM_EMAIL=info@cielodorado-tenerife.eu
-NOTIFICATION_EMAIL=info@cielodorado-tenerife.eu
+SMTP_USER=your_email@example.com
+SMTP_PASSWORD=your_actual_password_here
+SMTP_FROM_EMAIL=your_email@example.com
+NOTIFICATION_EMAIL=your_notification_email@example.com
 ```
 
 **Kde najít heslo:**
@@ -97,12 +97,12 @@ Pro produkční prostředí musíte nastavit stejné proměnné i na Vercelu:
 
 | Name | Value | Environment |
 |------|-------|-------------|
-| `SMTP_HOST` | `wes1-smtp.wedos.net` | Production, Preview, Development |
+| `SMTP_HOST` | `your_smtp_server` | Production, Preview, Development |
 | `SMTP_PORT` | `587` | Production, Preview, Development |
-| `SMTP_USER` | `info@cielodorado-tenerife.eu` | Production, Preview, Development |
-| `SMTP_PASSWORD` | `vaše_heslo` | Production, Preview, Development |
-| `SMTP_FROM_EMAIL` | `info@cielodorado-tenerife.eu` | Production, Preview, Development |
-| `NOTIFICATION_EMAIL` | `info@cielodorado-tenerife.eu` | Production, Preview, Development |
+| `SMTP_USER` | `your_email@example.com` | Production, Preview, Development |
+| `SMTP_PASSWORD` | `your_password` | Production, Preview, Development |
+| `SMTP_FROM_EMAIL` | `your_email@example.com` | Production, Preview, Development |
+| `NOTIFICATION_EMAIL` | `your_notification_email@example.com` | Production, Preview, Development |
 
 5. Klikněte **Save**
 6. **Redeploy** aplikaci, aby se změny projevily
@@ -125,13 +125,13 @@ http://localhost:3000/api/test-email
 
 3. **Co by se mělo stát:**
    - ✅ Měli byste vidět JSON odpověď s `"success": true`
-   - ✅ Na email `info@cielodorado-tenerife.eu` by měl přijít testovací email
+   - ✅ Na váš notifikační email by měl přijít testovací email
    - ✅ V konzoli by mělo být: `✅ Email server is ready to send messages`
 
 4. **Pokud vidíte chybu:**
    - ❌ Zkontrolujte heslo v `.env.local`
    - ❌ Zkontrolujte, že všechny proměnné jsou správně nastavené
-   - ❌ Zkontrolujte, že email `info@cielodorado-tenerife.eu` existuje v VEDOS.cz
+   - ❌ Zkontrolujte, že váš email existuje u vašeho poskytovatele
 
 ### Krok 2: Test rezervačního formuláře
 
@@ -145,7 +145,7 @@ http://localhost:3000/#booking
 3. **Co by se mělo stát:**
    - ✅ Rezervace se vytvoří v Firebase
    - ✅ Host dostane potvrzovací email na zadaný email
-   - ✅ Vy dostanete notifikační email na `info@cielodorado-tenerife.eu`
+   - ✅ Vy dostanete notifikační email na váš notifikační email
    - ✅ Zobrazí se úspěšná zpráva
 
 4. **Zkontrolujte konzoli prohlížeče (F12):**
@@ -187,9 +187,9 @@ http://localhost:3000/#booking
 
 **Řešení:**
 1. Zkontrolujte heslo v `.env.local`
-2. Zkontrolujte, že email `info@cielodorado-tenerife.eu` existuje v VEDOS.cz
-3. Zkontrolujte, že SMTP server je `wes1-smtp.wedos.net` a port `587`
-4. Zkuste se přihlásit do webmailu: https://webmail.wedos.net/
+2. Zkontrolujte, že váš email existuje u vašeho poskytovatele
+3. Zkontrolujte, že SMTP server a port jsou správné
+4. Zkuste se přihlásit do webmailu vašeho poskytovatele
 
 ### Problém: "Missing environment variables"
 

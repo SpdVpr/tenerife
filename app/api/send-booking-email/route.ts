@@ -7,9 +7,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { booking } = body;
 
-    if (!booking || !booking.id) {
+    if (!booking || !booking.id || !booking.bookingNumber) {
       return NextResponse.json(
-        { error: 'Missing booking data' },
+        { error: 'Missing booking data or booking number' },
         { status: 400 }
       );
     }
@@ -26,6 +26,7 @@ export async function POST(request: NextRequest) {
       'nights',
       'totalPrice',
       'pricePerNight',
+      'bookingNumber',
     ];
 
     for (const field of requiredFields) {
@@ -38,7 +39,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Send emails
-    const result = await sendBookingEmails(booking as BookingData & { id: string });
+    const result = await sendBookingEmails(booking as BookingData & { id: string; bookingNumber: number });
 
     // Check if both emails were sent successfully
     const allSuccess = result.guestEmail.success && result.ownerEmail.success;

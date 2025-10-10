@@ -33,11 +33,11 @@ http://localhost:3000/api/test-email
 
 **Očekávaný výsledek:**
 - ✅ Vidíte: `"success": true`
-- ✅ Dostanete testovací email na `info@cielodorado-tenerife.eu`
+- ✅ Dostanete testovací email na váš notifikační email
 
 **Pokud vidíte chybu:**
 - ❌ Zkontrolujte heslo v `.env.local`
-- ❌ Zkontrolujte, že email existuje v VEDOS.cz
+- ❌ Zkontrolujte, že váš email existuje u vašeho poskytovatele
 
 ---
 

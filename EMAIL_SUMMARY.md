@@ -50,7 +50,7 @@
 ```bash
 # Otevřete .env.local a nahraďte:
 SMTP_PASSWORD=YOUR_EMAIL_PASSWORD_HERE
-# skutečným heslem k emailu info@cielodorado-tenerife.eu
+# skutečným heslem k vašemu emailu
 ```
 
 ### Krok 2: Otestujte lokálně (POVINNÉ)
@@ -96,12 +96,12 @@ http://localhost:3000/api/test-email
 ### SMTP konfigurace:
 
 ```
-Server:   wes1-smtp.wedos.net
+Server:   your_smtp_server
 Port:     587 (TLS)
-User:     info@cielodorado-tenerife.eu
-Password: [vaše heslo]
-From:     Cielo Dorado Tenerife <info@cielodorado-tenerife.eu>
-To:       [email hosta] + info@cielodorado-tenerife.eu
+User:     your_email@example.com
+Password: [your password]
+From:     Your Name <your_email@example.com>
+To:       [guest email] + your_notification_email@example.com
 ```
 
 ---
@@ -130,7 +130,7 @@ To:       [email hosta] + info@cielodorado-tenerife.eu
 
 ### Použité technologie:
 - **Nodemailer** - SMTP klient pro Node.js
-- **VEDOS.cz SMTP** - wes1-smtp.wedos.net:587
+- **SMTP Server** - Váš email hosting provider
 - **Next.js API Routes** - Serverless funkce
 - **TypeScript** - Type safety
 - **HTML + CSS** - Responzivní email šablony
@@ -199,8 +199,8 @@ background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
 #### Kontaktní údaje:
 ```typescript
 // lib/email/templates.ts
-<p><strong>Email:</strong> info@cielodorado-tenerife.eu</p>
-<p><strong>Telefon:</strong> +420 777 123 456</p>
+<p><strong>Email:</strong> your_email@example.com</p>
+<p><strong>Telefon:</strong> your_phone_number</p>
 ```
 
 ---
@@ -216,20 +216,20 @@ npm run dev
 http://localhost:3000/api/test-email
 
 # 3. Zkontrolujte email
-# Měl by přijít na info@cielodorado-tenerife.eu
+# Měl by přijít na váš notifikační email
 ```
 
 ### Produkční test:
 ```bash
 # 1. Otevřete testovací endpoint
-https://www.cielodorado-tenerife.eu/api/test-email
+https://your-domain.com/api/test-email
 
 # 2. Vytvořte testovací rezervaci
-https://www.cielodorado-tenerife.eu/#booking
+https://your-domain.com/#booking
 
 # 3. Zkontrolujte oba emaily
 # - Host: email zadaný ve formuláři
-# - Majitel: info@cielodorado-tenerife.eu
+# - Majitel: váš notifikační email
 ```
 
 ---
