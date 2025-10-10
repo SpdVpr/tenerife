@@ -28,23 +28,59 @@ export interface BookingData {
   pricePerNight: number;
   status: 'pending' | 'confirmed' | 'cancelled';
   createdAt: Date;
+  bookingNumber?: number; // Numeric booking number (variable symbol)
 }
 
 export interface BookingDocument extends BookingData {
   id: string;
+  bookingNumber: number;
 }
 
 const BOOKINGS_COLLECTION = 'bookings';
+const COUNTERS_COLLECTION = 'counters';
+
+/**
+ * Generate a unique numeric booking number
+ */
+async function generateBookingNumber(): Promise<number> {
+  try {
+    const counterRef = doc(db, COUNTERS_COLLECTION, 'bookingNumber');
+    const counterDoc = await getDoc(counterRef);
+
+    let nextNumber = 1000; // Start from 1000
+
+    if (counterDoc.exists()) {
+      nextNumber = (counterDoc.data().value || 999) + 1;
+      await updateDoc(counterRef, { value: nextNumber });
+    } else {
+      // Create counter if it doesn't exist
+      await addDoc(collection(db, COUNTERS_COLLECTION), {
+        id: 'bookingNumber',
+        value: nextNumber
+      });
+    }
+
+    return nextNumber;
+  } catch (error) {
+    console.error('Error generating booking number:', error);
+    // Fallback to timestamp-based number
+    return parseInt(Date.now().toString().slice(-6));
+  }
+}
 
 /**
  * Create a new booking in Firestore
  */
-export async function createBooking(bookingData: Omit<BookingData, 'createdAt' | 'status'>): Promise<string> {
+export async function createBooking(bookingData: Omit<BookingData, 'createdAt' | 'status' | 'bookingNumber'>): Promise<string> {
   try {
+    // Generate unique booking number
+    const bookingNumber = await generateBookingNumber();
+
     const booking: BookingData = {
       ...bookingData,
       status: 'pending',
       createdAt: new Date(),
+      bookingNumber,
     };
 
     const docRef = await addDoc(collection(db, BOOKINGS_COLLECTION), {
@@ -52,7 +88,7 @@ export async function createBooking(bookingData: Omit<BookingData, 'createdAt' |
       createdAt: Timestamp.fromDate(booking.createdAt),
     });
 
-    console.log('Booking created with ID:', docRef.id);
+    console.log('Booking created with ID:', docRef.id, 'Booking Number:', bookingNumber);
     return docRef.id;
   } catch (error) {
     console.error('Error creating booking:', error);

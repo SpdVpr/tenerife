@@ -117,7 +117,7 @@ function formatDate(dateString: string): string {
 }
 
 // Guest confirmation email template
-export function getGuestConfirmationEmail(booking: BookingData & { id: string }): {
+export function getGuestConfirmationEmail(booking: BookingData & { id: string; bookingNumber: number }): {
   subject: string;
   html: string;
   text: string;
@@ -126,6 +126,35 @@ export function getGuestConfirmationEmail(booking: BookingData & { id: string })
   const checkOutDate = formatDate(booking.checkOut);
   const cleaningFee = 80;
   const subtotal = booking.nights * booking.pricePerNight;
+  const deposit50 = Math.round(booking.totalPrice * 0.5);
+  const remaining50 = booking.totalPrice - deposit50;
+
+  // Calculate deposit due date (7 days from now)
+  const depositDueDate = new Date();
+  depositDueDate.setDate(depositDueDate.getDate() + 7);
+  const depositDueDateStr = depositDueDate.toLocaleDateString('cs-CZ', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
+  // Calculate remaining payment due date (1 month before check-in)
+  const remainingDueDate = new Date(booking.checkIn);
+  remainingDueDate.setMonth(remainingDueDate.getMonth() - 1);
+  const remainingDueDateStr = remainingDueDate.toLocaleDateString('cs-CZ', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
+  // Calculate cancellation deadline (1 month before check-in)
+  const cancellationDeadline = new Date(booking.checkIn);
+  cancellationDeadline.setMonth(cancellationDeadline.getMonth() - 1);
+  const cancellationDeadlineStr = cancellationDeadline.toLocaleDateString('cs-CZ', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
 
   const html = `
     <!DOCTYPE html>
@@ -149,8 +178,8 @@ export function getGuestConfirmationEmail(booking: BookingData & { id: string })
           <div class="booking-details">
             <h3 style="margin-top: 0; color: #1e40af;">📋 Detaily rezervace</h3>
             <div class="detail-row">
-              <span class="detail-label">Číslo rezervace:</span>
-              <span class="detail-value">#${booking.id.substring(0, 8).toUpperCase()}</span>
+              <span class="detail-label">Číslo rezervace / Variabilní symbol:</span>
+              <span class="detail-value" style="font-size: 18px; font-weight: bold; color: #1e40af;">${booking.bookingNumber}</span>
             </div>
             <div class="detail-row">
               <span class="detail-label">Příjezd:</span>
@@ -188,9 +217,40 @@ export function getGuestConfirmationEmail(booking: BookingData & { id: string })
 
           <div class="payment-info">
             <h3 style="margin-top: 0; color: #d97706;">💳 Platební informace</h3>
-            <p style="margin: 10px 0;">Pro potvrzení rezervace prosím uhraďte zálohu ve výši <strong>30% (${Math.round(booking.totalPrice * 0.3)} EUR)</strong> do 3 dnů.</p>
-            <p style="margin: 10px 0;">Zbývající částku uhraďte nejpozději 14 dní před příjezdem.</p>
-            <p style="margin: 10px 0;"><strong>Platební údaje vám zašleme v samostatném emailu.</strong></p>
+
+            <div style="background: white; padding: 15px; border-radius: 5px; margin: 15px 0;">
+              <p style="margin: 0 0 10px 0; font-weight: bold; color: #1e40af;">Bankovní účet:</p>
+              <p style="margin: 5px 0;"><strong>IBAN:</strong> ES56 0049 4166 2227 1404 1761</p>
+              <p style="margin: 5px 0;"><strong>SWIFT/BIC:</strong> BSCHESMMXXX</p>
+              <p style="margin: 5px 0;"><strong>Banka:</strong> BANCO SANTANDER, S.A.</p>
+              <p style="margin: 5px 0;"><strong>Variabilní symbol:</strong> <span style="font-size: 16px; font-weight: bold; color: #d97706;">${booking.bookingNumber}</span></p>
+            </div>
+
+            <div style="background: #fef3c7; padding: 15px; border-radius: 5px; margin: 15px 0; border-left: 4px solid #f59e0b;">
+              <p style="margin: 0 0 10px 0; font-weight: bold; font-size: 16px;">📅 Platební podmínky:</p>
+
+              <p style="margin: 10px 0;">
+                <strong>1. Záloha 50%:</strong> ${deposit50} EUR<br>
+                <span style="color: #92400e;">Splatnost: do ${depositDueDateStr}</span>
+              </p>
+
+              <p style="margin: 10px 0;">
+                <strong>2. Zbývajících 50%:</strong> ${remaining50} EUR<br>
+                <span style="color: #92400e;">Splatnost: do ${remainingDueDateStr}</span>
+              </p>
+
+              <p style="margin: 15px 0 10px 0; padding: 10px; background: white; border-radius: 5px;">
+                💡 <strong>Tip:</strong> Pokud chcete, můžete uhradit celou částku <strong>${booking.totalPrice} EUR</strong> najednou.
+              </p>
+            </div>
+
+            <div style="background: #fee2e2; padding: 15px; border-radius: 5px; margin: 15px 0; border-left: 4px solid #ef4444;">
+              <p style="margin: 0; color: #991b1b;">
+                <strong>⚠️ Storno podmínky:</strong><br>
+                Bezplatné storno je možné do <strong>${cancellationDeadlineStr}</strong> (měsíc před příjezdem).<br>
+                Po tomto datu nebude záloha vrácena.
+              </p>
+            </div>
           </div>
 
           ${booking.message ? `
@@ -231,7 +291,7 @@ Milý/á ${booking.firstName} ${booking.lastName},
 Vaše rezervace apartmánu Cielo Dorado na Tenerife byla úspěšně přijata.
 
 DETAILY REZERVACE:
-- Číslo rezervace: #${booking.id.substring(0, 8).toUpperCase()}
+- Číslo rezervace / Variabilní symbol: ${booking.bookingNumber}
 - Příjezd: ${checkInDate}
 - Odjezd: ${checkOutDate}
 - Počet nocí: ${booking.nights}
@@ -243,9 +303,25 @@ CENOVÝ SOUHRN:
 - CELKOVÁ CENA: ${booking.totalPrice} EUR
 
 PLATEBNÍ INFORMACE:
-Pro potvrzení rezervace prosím uhraďte zálohu ve výši 30% (${Math.round(booking.totalPrice * 0.3)} EUR) do 3 dnů.
-Zbývající částku uhraďte nejpozději 14 dní před příjezdem.
-Platební údaje vám zašleme v samostatném emailu.
+
+Bankovní účet:
+IBAN: ES56 0049 4166 2227 1404 1761
+SWIFT/BIC: BSCHESMMXXX
+Banka: BANCO SANTANDER, S.A.
+Variabilní symbol: ${booking.bookingNumber}
+
+Platební podmínky:
+1. Záloha 50%: ${deposit50} EUR
+   Splatnost: do ${depositDueDateStr}
+
+2. Zbývajících 50%: ${remaining50} EUR
+   Splatnost: do ${remainingDueDateStr}
+
+TIP: Pokud chcete, můžete uhradit celou částku ${booking.totalPrice} EUR najednou.
+
+STORNO PODMÍNKY:
+Bezplatné storno je možné do ${cancellationDeadlineStr} (měsíc před příjezdem).
+Po tomto datu nebude záloha vrácena.
 
 ${booking.message ? `VAŠE ZPRÁVA:\n"${booking.message}"\n` : ''}
 
@@ -259,20 +335,21 @@ Tým Cielo Dorado
   `;
 
   return {
-    subject: `Potvrzení rezervace #${booking.id.substring(0, 8).toUpperCase()} - Cielo Dorado Tenerife`,
+    subject: `Potvrzení rezervace #${booking.bookingNumber} - Cielo Dorado Tenerife`,
     html,
     text,
   };
 }
 
 // Owner notification email template
-export function getOwnerNotificationEmail(booking: BookingData & { id: string }): {
+export function getOwnerNotificationEmail(booking: BookingData & { id: string; bookingNumber: number }): {
   subject: string;
   html: string;
   text: string;
 } {
   const checkInDate = formatDate(booking.checkIn);
   const checkOutDate = formatDate(booking.checkOut);
+  const deposit50 = Math.round(booking.totalPrice * 0.5);
 
   const html = `
     <!DOCTYPE html>
@@ -295,12 +372,16 @@ export function getOwnerNotificationEmail(booking: BookingData & { id: string })
           <div class="booking-details">
             <h3 style="margin-top: 0; color: #059669;">📋 Informace o rezervaci</h3>
             <div class="detail-row">
-              <span class="detail-label">ID rezervace:</span>
-              <span class="detail-value">#${booking.id.substring(0, 8).toUpperCase()}</span>
+              <span class="detail-label">Číslo rezervace:</span>
+              <span class="detail-value" style="font-size: 18px; font-weight: bold; color: #059669;">${booking.bookingNumber}</span>
             </div>
             <div class="detail-row">
               <span class="detail-label">Status:</span>
               <span class="detail-value" style="color: #f59e0b;">⏳ Čeká na potvrzení</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Očekávaná záloha (50%):</span>
+              <span class="detail-value" style="font-weight: bold; color: #059669;">${deposit50} EUR</span>
             </div>
             <div class="detail-row">
               <span class="detail-label">Příjezd:</span>
@@ -379,13 +460,14 @@ NOVÁ REZERVACE - Cielo Dorado Tenerife
 Do systému byla právě vložena nová rezervace.
 
 INFORMACE O REZERVACI:
-- ID: #${booking.id.substring(0, 8).toUpperCase()}
+- Číslo rezervace: ${booking.bookingNumber}
 - Status: Čeká na potvrzení
 - Příjezd: ${checkInDate}
 - Odjezd: ${checkOutDate}
 - Počet nocí: ${booking.nights}
 - Počet hostů: ${booking.guests}
 - Celková cena: ${booking.totalPrice} EUR
+- Očekávaná záloha (50%): ${deposit50} EUR
 
 KONTAKTNÍ ÚDAJE HOSTA:
 - Jméno: ${booking.firstName} ${booking.lastName}
@@ -394,17 +476,22 @@ KONTAKTNÍ ÚDAJE HOSTA:
 
 ${booking.message ? `ZPRÁVA OD HOSTA:\n"${booking.message}"\n` : ''}
 
+PLATEBNÍ ÚDAJE (již odeslány hostovi):
+- Variabilní symbol: ${booking.bookingNumber}
+- IBAN: ES56 0049 4166 2227 1404 1761
+- Záloha 50%: ${deposit50} EUR (splatnost: 7 dní)
+
 DALŠÍ KROKY:
 1. Zkontrolujte dostupnost v kalendáři
-2. Potvrďte rezervaci v admin panelu
-3. Zašlete hostovi platební údaje
-4. Po obdržení zálohy potvrďte rezervaci
+2. Sledujte příchozí platby (VS: ${booking.bookingNumber})
+3. Po obdržení zálohy potvrďte rezervaci v admin panelu
+4. Připomeňte hostovi zbývající platbu měsíc před příjezdem
 
 Admin panel: https://www.cielodorado-tenerife.eu/admin
   `;
 
   return {
-    subject: `🔔 Nová rezervace #${booking.id.substring(0, 8).toUpperCase()} - ${booking.firstName} ${booking.lastName}`,
+    subject: `🔔 Nová rezervace #${booking.bookingNumber} - ${booking.firstName} ${booking.lastName}`,
     html,
     text,
   };

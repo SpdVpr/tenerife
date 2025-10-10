@@ -105,6 +105,14 @@ export default function Booking() {
 
       console.log('Booking created with ID:', bookingId);
 
+      // Get the created booking to retrieve bookingNumber
+      const { getBookingById } = await import('@/lib/firebase/bookings');
+      const createdBooking = await getBookingById(bookingId);
+
+      if (!createdBooking) {
+        throw new Error('Failed to retrieve created booking');
+      }
+
       // Send confirmation emails
       try {
         const emailResponse = await fetch('/api/send-booking-email', {
@@ -115,6 +123,7 @@ export default function Booking() {
           body: JSON.stringify({
             booking: {
               id: bookingId,
+              bookingNumber: createdBooking.bookingNumber,
               checkIn: formData.checkIn,
               checkOut: formData.checkOut,
               guests: formData.guests,

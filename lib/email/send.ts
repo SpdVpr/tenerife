@@ -12,7 +12,7 @@ export interface SendEmailResult {
  * Send booking confirmation email to guest
  */
 export async function sendGuestConfirmationEmail(
-  booking: BookingData & { id: string }
+  booking: BookingData & { id: string; bookingNumber: number }
 ): Promise<SendEmailResult> {
   try {
     const transporter = createEmailTransporter();
@@ -44,7 +44,7 @@ export async function sendGuestConfirmationEmail(
  * Send booking notification email to owner
  */
 export async function sendOwnerNotificationEmail(
-  booking: BookingData & { id: string }
+  booking: BookingData & { id: string; bookingNumber: number }
 ): Promise<SendEmailResult> {
   try {
     const transporter = createEmailTransporter();
@@ -76,7 +76,7 @@ export async function sendOwnerNotificationEmail(
  * Send both guest confirmation and owner notification emails
  */
 export async function sendBookingEmails(
-  booking: BookingData & { id: string }
+  booking: BookingData & { id: string; bookingNumber: number }
 ): Promise<{
   guestEmail: SendEmailResult;
   ownerEmail: SendEmailResult;
