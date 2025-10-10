@@ -6,6 +6,7 @@ Moderní webová prezentace luxusního apartmánu v Los Gigantes, Tenerife s pln
 
 - **Responzivní design** - Optimalizováno pro mobil, tablet i desktop
 - **Rezervační systém** - Integrovaný s Firebase/Firestore
+- **📧 Automatické emaily** - Potvrzení rezervace pro hosty + notifikace pro majitele
 - **Galerie** - 32 optimalizovaných fotografií s lightboxem a filtrováním
 - **Kalendář dostupnosti** - Vizuální zobrazení volných termínů
 - **Guest Book** - Kompletní průvodce pro hosty (12 sekcí)
@@ -72,6 +73,23 @@ npm run dev
 ```
 
 Otevřete [http://localhost:3000](http://localhost:3000) v prohlížeči.
+
+## 📧 Nastavení emailového systému
+
+Pro automatické odesílání potvrzovacích emailů po rezervaci:
+
+**Rychlý start:** Viz `EMAIL_QUICKSTART.md` (5 kroků, 10 minut)
+
+**Kompletní návod:** Viz `EMAIL_SETUP.md`
+
+**DNS nastavení:** Viz `VERCEL_DNS_SETUP.md`
+
+### Rychlý přehled:
+1. Nastavte heslo v `.env.local` (SMTP_PASSWORD)
+2. Restartujte server
+3. Otestujte: `http://localhost:3000/api/test-email`
+4. Nastavte environment variables na Vercelu
+5. Redeploy
 
 ## 🚀 Deployment na Vercel
 

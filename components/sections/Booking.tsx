@@ -105,6 +105,46 @@ export default function Booking() {
 
       console.log('Booking created with ID:', bookingId);
 
+      // Send confirmation emails
+      try {
+        const emailResponse = await fetch('/api/send-booking-email', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            booking: {
+              id: bookingId,
+              checkIn: formData.checkIn,
+              checkOut: formData.checkOut,
+              guests: formData.guests,
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+              email: formData.email,
+              phone: formData.phone,
+              message: formData.message || '',
+              nights,
+              totalPrice,
+              pricePerNight,
+              status: 'pending',
+              createdAt: new Date(),
+            },
+          }),
+        });
+
+        const emailResult = await emailResponse.json();
+
+        if (emailResult.success) {
+          console.log('✅ Confirmation emails sent successfully');
+        } else {
+          console.warn('⚠️ Some emails failed to send:', emailResult);
+          // Don't fail the booking if emails fail - booking is already created
+        }
+      } catch (emailError) {
+        console.error('❌ Error sending emails:', emailError);
+        // Don't fail the booking if emails fail - booking is already created
+      }
+
       // Show success message
       setSubmitSuccess(true);
 
