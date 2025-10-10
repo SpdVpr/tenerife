@@ -49,14 +49,22 @@ export default function AvailabilityCalendar({
     }
   };
 
+  // Helper function to format date without timezone issues
+  const formatDate = (date: Date): string => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   const isDateOccupied = (date: Date): boolean => {
-    const dateStr = date.toISOString().split('T')[0];
+    const dateStr = formatDate(date);
     return occupiedDates.includes(dateStr);
   };
 
   const tileClassName = ({ date, view }: { date: Date; view: string }) => {
     if (view === 'month') {
-      const dateStr = date.toISOString().split('T')[0];
+      const dateStr = formatDate(date);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
@@ -96,9 +104,9 @@ export default function AvailabilityCalendar({
     setDateRange(value);
 
     if (Array.isArray(value) && value[0] && value[1]) {
-      const checkIn = value[0].toISOString().split('T')[0];
-      const checkOut = value[1].toISOString().split('T')[0];
-      
+      const checkIn = formatDate(value[0]);
+      const checkOut = formatDate(value[1]);
+
       // Check if any date in the range is occupied
       const start = new Date(value[0]);
       const end = new Date(value[1]);
