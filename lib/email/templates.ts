@@ -262,8 +262,7 @@ export function getGuestConfirmationEmail(booking: BookingData & { id: string; b
 
           <div class="contact-info">
             <h3 style="color: #1e40af;">📞 Kontaktní informace</h3>
-            <p><strong>Email:</strong> info@cielodorado-tenerife.eu</p>
-            <p><strong>Telefon:</strong> +420 777 123 456</p>
+            <p><strong>Email:</strong> martin.holann@gmail.com</p>
             <p><strong>Web:</strong> <a href="https://www.cielodorado-tenerife.eu">www.cielodorado-tenerife.eu</a></p>
           </div>
 
@@ -326,8 +325,7 @@ Po tomto datu nebude záloha vrácena.
 ${booking.message ? `VAŠE ZPRÁVA:\n"${booking.message}"\n` : ''}
 
 KONTAKT:
-Email: info@cielodorado-tenerife.eu
-Telefon: +420 777 123 456
+Email: martin.holann@gmail.com
 Web: www.cielodorado-tenerife.eu
 
 Těšíme se na vás!

@@ -41,7 +41,8 @@ export async function sendGuestConfirmationEmail(
 }
 
 /**
- * Send booking notification email to owner
+ * Send booking notification email to owner(s)
+ * Sends to primary notification email + additional emails
  */
 export async function sendOwnerNotificationEmail(
   booking: BookingData & { id: string; bookingNumber: number }
@@ -50,15 +51,22 @@ export async function sendOwnerNotificationEmail(
     const transporter = createEmailTransporter();
     const emailContent = getOwnerNotificationEmail(booking);
 
+    // Combine primary and additional notification emails
+    const allNotificationEmails = [
+      emailConfig.notificationEmail,
+      ...emailConfig.additionalNotificationEmails
+    ].filter(Boolean); // Remove any empty values
+
     const info = await transporter.sendMail({
       from: `"${emailConfig.from.name}" <${emailConfig.from.email}>`,
-      to: emailConfig.notificationEmail,
+      to: allNotificationEmails.join(', '), // Send to all emails
       subject: emailContent.subject,
       text: emailContent.text,
       html: emailContent.html,
     });
 
-    console.log('✅ Owner notification email sent:', info.messageId);
+    console.log('✅ Owner notification emails sent to:', allNotificationEmails.join(', '));
+    console.log('   Message ID:', info.messageId);
     return {
       success: true,
       messageId: info.messageId,

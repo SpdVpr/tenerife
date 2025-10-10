@@ -7,6 +7,10 @@ export const emailConfig = {
     email: process.env.SMTP_FROM_EMAIL || 'info@cielodorado-tenerife.eu',
   },
   notificationEmail: process.env.NOTIFICATION_EMAIL || 'info@cielodorado-tenerife.eu',
+  // Additional notification emails (comma-separated in env var or hardcoded)
+  additionalNotificationEmails: process.env.ADDITIONAL_NOTIFICATION_EMAILS
+    ? process.env.ADDITIONAL_NOTIFICATION_EMAILS.split(',').map(e => e.trim())
+    : ['martin.holann@gmail.com'],
 };
 
 // Create reusable transporter
