@@ -27,6 +27,7 @@ export interface BookingData {
   totalPrice: number;
   pricePerNight: number;
   status: 'pending' | 'confirmed' | 'cancelled';
+  paymentStatus: 'unpaid' | 'deposit_paid' | 'fully_paid';
   createdAt: Date;
   bookingNumber?: number; // Numeric booking number (variable symbol)
 }
@@ -71,7 +72,7 @@ async function generateBookingNumber(): Promise<number> {
 /**
  * Create a new booking in Firestore
  */
-export async function createBooking(bookingData: Omit<BookingData, 'createdAt' | 'status' | 'bookingNumber'>): Promise<string> {
+export async function createBooking(bookingData: Omit<BookingData, 'createdAt' | 'status' | 'bookingNumber' | 'paymentStatus'>): Promise<string> {
   try {
     // Generate unique booking number
     const bookingNumber = await generateBookingNumber();
@@ -79,6 +80,7 @@ export async function createBooking(bookingData: Omit<BookingData, 'createdAt' |
     const booking: BookingData = {
       ...bookingData,
       status: 'pending',
+      paymentStatus: 'unpaid',
       createdAt: new Date(),
       bookingNumber,
     };
@@ -263,6 +265,23 @@ export async function updateBookingStatus(
   } catch (error) {
     console.error('Error updating booking status:', error);
     throw new Error('Failed to update booking status');
+  }
+}
+
+/**
+ * Update booking payment status
+ */
+export async function updatePaymentStatus(
+  bookingId: string,
+  paymentStatus: 'unpaid' | 'deposit_paid' | 'fully_paid'
+): Promise<void> {
+  try {
+    const bookingRef = doc(db, BOOKINGS_COLLECTION, bookingId);
+    await updateDoc(bookingRef, { paymentStatus });
+    console.log('Payment status updated:', bookingId, paymentStatus);
+  } catch (error) {
+    console.error('Error updating payment status:', error);
+    throw new Error('Failed to update payment status');
   }
 }
 

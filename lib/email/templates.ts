@@ -201,18 +201,20 @@ export function getGuestConfirmationEmail(booking: BookingData & { id: string; b
 
           <div class="price-summary">
             <h3 style="margin-top: 0; color: #1e40af;">💰 Cenový souhrn</h3>
-            <div class="price-row">
-              <span>${booking.nights} ${booking.nights === 1 ? 'noc' : booking.nights < 5 ? 'noci' : 'nocí'} × ${booking.pricePerNight} EUR</span>
-              <span>${subtotal} EUR</span>
-            </div>
-            <div class="price-row">
-              <span>Úklidový poplatek</span>
-              <span>${cleaningFee} EUR</span>
-            </div>
-            <div class="price-row total-row">
-              <span>Celková cena</span>
-              <span>${booking.totalPrice} EUR</span>
-            </div>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 8px 0; text-align: left;">${booking.nights} ${booking.nights === 1 ? 'noc' : booking.nights < 5 ? 'noci' : 'nocí'} × ${booking.pricePerNight} EUR:</td>
+                <td style="padding: 8px 0; text-align: right; font-weight: 600;">${subtotal} EUR</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; text-align: left;">Úklidový poplatek:</td>
+                <td style="padding: 8px 0; text-align: right; font-weight: 600;">${cleaningFee} EUR</td>
+              </tr>
+              <tr style="border-top: 2px solid #3b82f6;">
+                <td style="padding: 12px 0 0 0; text-align: left; font-size: 18px; font-weight: bold; color: #1e40af;">Celková cena:</td>
+                <td style="padding: 12px 0 0 0; text-align: right; font-size: 18px; font-weight: bold; color: #1e40af;">${booking.totalPrice} EUR</td>
+              </tr>
+            </table>
           </div>
 
           <div class="payment-info">
@@ -490,6 +492,184 @@ Admin panel: https://www.cielodorado-tenerife.eu/admin
 
   return {
     subject: `🔔 Nová rezervace #${booking.bookingNumber} - ${booking.firstName} ${booking.lastName}`,
+    html,
+    text,
+  };
+}
+
+// Booking confirmation email (sent when admin confirms)
+export function getBookingConfirmationEmail(booking: BookingData & { id: string; bookingNumber: number }): {
+  subject: string;
+  html: string;
+  text: string;
+} {
+  const checkInDate = formatDate(booking.checkIn);
+  const checkOutDate = formatDate(booking.checkOut);
+  const cleaningFee = 80;
+  const subtotal = booking.totalPrice - cleaningFee;
+  const deposit50 = Math.round(booking.totalPrice * 0.5);
+  const remaining50 = booking.totalPrice - deposit50;
+
+  // Calculate payment deadlines
+  const depositDeadline = new Date();
+  depositDeadline.setDate(depositDeadline.getDate() + 7);
+  const depositDeadlineStr = depositDeadline.toLocaleDateString('cs-CZ');
+
+  const checkInDateObj = new Date(booking.checkIn);
+  const remainingDeadline = new Date(checkInDateObj);
+  remainingDeadline.setMonth(remainingDeadline.getMonth() - 1);
+  const remainingDeadlineStr = remainingDeadline.toLocaleDateString('cs-CZ');
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>${emailStyles}</style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>✅ Rezervace potvrzena!</h1>
+          <p style="margin: 10px 0 0 0; font-size: 16px;">Číslo rezervace: #${booking.bookingNumber}</p>
+        </div>
+
+        <div class="content">
+          <p>Dobrý den ${booking.firstName},</p>
+
+          <p><strong>Vaše rezervace byla úspěšně potvrzena!</strong> 🎉</p>
+
+          <p>Těšíme se na Vaši návštěvu v apartmánu Cielo Dorado na Tenerife.</p>
+
+          <div class="booking-details">
+            <h3 style="margin-top: 0; color: #1e40af;">📅 Detaily rezervace</h3>
+            <div class="detail-row">
+              <span class="detail-label">Číslo rezervace:</span>
+              <span class="detail-value">#${booking.bookingNumber}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Příjezd:</span>
+              <span class="detail-value">${checkInDate}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Odjezd:</span>
+              <span class="detail-value">${checkOutDate}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Počet nocí:</span>
+              <span class="detail-value">${booking.nights} ${booking.nights === 1 ? 'noc' : booking.nights < 5 ? 'noci' : 'nocí'}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Počet hostů:</span>
+              <span class="detail-value">${booking.guests} ${booking.guests === 1 ? 'osoba' : booking.guests < 5 ? 'osoby' : 'osob'}</span>
+            </div>
+          </div>
+
+          <div class="price-summary">
+            <h3 style="margin-top: 0; color: #1e40af;">💰 Cenový souhrn</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 8px 0; text-align: left;">${booking.nights} ${booking.nights === 1 ? 'noc' : booking.nights < 5 ? 'noci' : 'nocí'} × ${booking.pricePerNight} EUR:</td>
+                <td style="padding: 8px 0; text-align: right; font-weight: 600;">${subtotal} EUR</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; text-align: left;">Úklidový poplatek:</td>
+                <td style="padding: 8px 0; text-align: right; font-weight: 600;">${cleaningFee} EUR</td>
+              </tr>
+              <tr style="border-top: 2px solid #3b82f6;">
+                <td style="padding: 12px 0 0 0; text-align: left; font-size: 18px; font-weight: bold; color: #1e40af;">Celková cena:</td>
+                <td style="padding: 12px 0 0 0; text-align: right; font-size: 18px; font-weight: bold; color: #1e40af;">${booking.totalPrice} EUR</td>
+              </tr>
+            </table>
+          </div>
+
+          <div class="payment-info">
+            <h3 style="margin-top: 0; color: #d97706;">💳 Platební informace</h3>
+
+            <div style="background: white; padding: 15px; border-radius: 5px; margin: 15px 0;">
+              <p style="margin: 0 0 10px 0; font-weight: bold; color: #1e40af;">Bankovní účet:</p>
+              <p style="margin: 5px 0;"><strong>IBAN:</strong> ES56 0049 4166 2227 1404 1761</p>
+              <p style="margin: 5px 0;"><strong>SWIFT/BIC:</strong> BSCHESMMXXX</p>
+              <p style="margin: 5px 0;"><strong>Banka:</strong> BANCO SANTANDER, S.A.</p>
+              <p style="margin: 5px 0;"><strong>Variabilní symbol:</strong> ${booking.bookingNumber}</p>
+            </div>
+
+            <div style="background: white; padding: 15px; border-radius: 5px; margin: 15px 0;">
+              <p style="margin: 0 0 10px 0; font-weight: bold; color: #d97706;">Platební podmínky:</p>
+              <p style="margin: 5px 0;">✅ <strong>Záloha 50%:</strong> ${deposit50} EUR (splatnost: ${depositDeadlineStr})</p>
+              <p style="margin: 5px 0;">✅ <strong>Zbývajících 50%:</strong> ${remaining50} EUR (splatnost: ${remainingDeadlineStr})</p>
+            </div>
+
+            <p style="margin: 15px 0; padding: 10px; background: #fef3c7; border-left: 4px solid #f59e0b; border-radius: 3px;">
+              <strong>⚠️ Důležité:</strong> Prosím uveďte variabilní symbol <strong>${booking.bookingNumber}</strong> při platbě.
+            </p>
+          </div>
+
+          <div class="contact-info">
+            <h3 style="color: #1e40af;">📞 Kontaktní informace</h3>
+            <p><strong>Email:</strong> martin.holann@gmail.com</p>
+            <p><strong>Web:</strong> <a href="https://www.cielodorado-tenerife.eu">www.cielodorado-tenerife.eu</a></p>
+          </div>
+
+          <p style="margin-top: 30px;">Těšíme se na Vás!</p>
+          <p><strong>Tým Cielo Dorado</strong></p>
+        </div>
+
+        <div class="footer">
+          <p>Tento email byl odeslán automaticky systémem rezervací Cielo Dorado.</p>
+          <p>&copy; ${new Date().getFullYear()} Cielo Dorado Tenerife. Všechna práva vyhrazena.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const text = `
+REZERVACE POTVRZENA!
+Číslo rezervace: #${booking.bookingNumber}
+
+Dobrý den ${booking.firstName},
+
+Vaše rezervace byla úspěšně potvrzena! 🎉
+
+Těšíme se na Vaši návštěvu v apartmánu Cielo Dorado na Tenerife.
+
+DETAILY REZERVACE:
+- Číslo rezervace: #${booking.bookingNumber}
+- Příjezd: ${checkInDate}
+- Odjezd: ${checkOutDate}
+- Počet nocí: ${booking.nights}
+- Počet hostů: ${booking.guests}
+
+CENOVÝ SOUHRN:
+- ${booking.nights} nocí × ${booking.pricePerNight} EUR = ${subtotal} EUR
+- Úklidový poplatek: ${cleaningFee} EUR
+- CELKOVÁ CENA: ${booking.totalPrice} EUR
+
+PLATEBNÍ INFORMACE:
+
+Bankovní účet:
+IBAN: ES56 0049 4166 2227 1404 1761
+SWIFT/BIC: BSCHESMMXXX
+Banka: BANCO SANTANDER, S.A.
+Variabilní symbol: ${booking.bookingNumber}
+
+Platební podmínky:
+✅ Záloha 50%: ${deposit50} EUR (splatnost: ${depositDeadlineStr})
+✅ Zbývajících 50%: ${remaining50} EUR (splatnost: ${remainingDeadlineStr})
+
+⚠️ DŮLEŽITÉ: Prosím uveďte variabilní symbol ${booking.bookingNumber} při platbě.
+
+KONTAKT:
+Email: martin.holann@gmail.com
+Web: www.cielodorado-tenerife.eu
+
+Těšíme se na Vás!
+Tým Cielo Dorado
+  `;
+
+  return {
+    subject: `✅ Rezervace potvrzena #${booking.bookingNumber} - Cielo Dorado Tenerife`,
     html,
     text,
   };

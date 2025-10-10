@@ -5,6 +5,7 @@ import {
   getAllBookings,
   BookingDocument,
   updateBookingStatus,
+  updatePaymentStatus,
   deleteBooking
 } from '@/lib/firebase/bookings';
 import { Calendar, Users, Mail, Phone, Clock, Euro, Loader2, Check, X, Trash2, RefreshCw, LogOut } from 'lucide-react';
@@ -42,11 +43,76 @@ export default function AdminPage() {
   const handleStatusChange = async (bookingId: string, newStatus: 'pending' | 'confirmed' | 'cancelled') => {
     try {
       await updateBookingStatus(bookingId, newStatus);
+
+      // If confirming, send confirmation email
+      if (newStatus === 'confirmed') {
+        const booking = bookings.find(b => b.id === bookingId);
+        if (booking) {
+          try {
+            const response = await fetch('/api/send-confirmation-email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ booking }),
+            });
+
+            if (response.ok) {
+              alert('Rezervace potvrzena a email odeslán hostovi!');
+            } else {
+              alert('Rezervace potvrzena, ale email se nepodařilo odeslat.');
+            }
+          } catch (emailError) {
+            console.error('Error sending confirmation email:', emailError);
+            alert('Rezervace potvrzena, ale email se nepodařilo odeslat.');
+          }
+        }
+      }
+
       // Reload bookings
       await loadBookings();
     } catch (err) {
       console.error('Error updating status:', err);
       alert('Chyba při změně statusu rezervace');
+    }
+  };
+
+  const handlePaymentStatusChange = async (
+    bookingId: string,
+    newPaymentStatus: 'unpaid' | 'deposit_paid' | 'fully_paid'
+  ) => {
+    try {
+      await updatePaymentStatus(bookingId, newPaymentStatus);
+
+      // Send payment confirmation email
+      if (newPaymentStatus === 'deposit_paid' || newPaymentStatus === 'fully_paid') {
+        const booking = bookings.find(b => b.id === bookingId);
+        if (booking) {
+          try {
+            const response = await fetch('/api/send-payment-email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                booking,
+                paymentType: newPaymentStatus
+              }),
+            });
+
+            if (response.ok) {
+              alert('Platební status aktualizován a email odeslán hostovi!');
+            } else {
+              alert('Platební status aktualizován, ale email se nepodařilo odeslat.');
+            }
+          } catch (emailError) {
+            console.error('Error sending payment email:', emailError);
+            alert('Platební status aktualizován, ale email se nepodařilo odeslat.');
+          }
+        }
+      }
+
+      // Reload bookings
+      await loadBookings();
+    } catch (err) {
+      console.error('Error updating payment status:', err);
+      alert('Chyba při změně platebního statusu');
     }
   };
 
@@ -88,6 +154,32 @@ export default function AdminPage() {
         return 'Zrušeno';
       default:
         return status;
+    }
+  };
+
+  const getPaymentStatusColor = (paymentStatus: string) => {
+    switch (paymentStatus) {
+      case 'fully_paid':
+        return 'bg-green-100 text-green-800';
+      case 'deposit_paid':
+        return 'bg-blue-100 text-blue-800';
+      case 'unpaid':
+        return 'bg-orange-100 text-orange-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getPaymentStatusText = (paymentStatus: string) => {
+    switch (paymentStatus) {
+      case 'fully_paid':
+        return '💰 Plně zaplaceno';
+      case 'deposit_paid':
+        return '💵 Záloha zaplacena';
+      case 'unpaid':
+        return '⏳ Nezaplaceno';
+      default:
+        return paymentStatus;
     }
   };
 
@@ -203,12 +295,15 @@ export default function AdminPage() {
                       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                         {/* Left Side - Guest Info */}
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
+                          <div className="flex items-center gap-2 mb-2 flex-wrap">
                             <h3 className="text-lg font-bold text-gray-900">
                               {booking.firstName} {booking.lastName}
                             </h3>
                             <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(booking.status)}`}>
                               {getStatusText(booking.status)}
+                            </span>
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getPaymentStatusColor(booking.paymentStatus || 'unpaid')}`}>
+                              {getPaymentStatusText(booking.paymentStatus || 'unpaid')}
                             </span>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-600">
@@ -277,19 +372,20 @@ export default function AdminPage() {
                       )}
 
                       {/* Actions */}
-                      <div className="mt-4 pt-4 border-t border-gray-200">
+                      <div className="mt-4 pt-4 border-t border-gray-200 space-y-3">
+                        {/* Row 1: Status Actions */}
                         <div className="flex items-center justify-between">
                           <div className="text-xs text-gray-500">
                             Vytvořeno: {booking.createdAt.toLocaleString('cs-CZ')}
                           </div>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-2 flex-wrap">
                             {/* Status Buttons */}
                             {booking.status === 'pending' && (
                               <>
                                 <button
                                   onClick={() => handleStatusChange(booking.id, 'confirmed')}
                                   className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition-colors"
-                                  title="Potvrdit rezervaci"
+                                  title="Potvrdit rezervaci a odeslat email"
                                 >
                                   <Check className="w-4 h-4" />
                                   Potvrdit
@@ -333,6 +429,51 @@ export default function AdminPage() {
                               <Trash2 className="w-4 h-4" />
                               Smazat
                             </button>
+                          </div>
+                        </div>
+
+                        {/* Row 2: Payment Actions */}
+                        <div className="flex items-center justify-between">
+                          <div className="text-xs font-semibold text-gray-700">
+                            💳 Platební akce:
+                          </div>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            {/* Payment Buttons */}
+                            {(booking.paymentStatus === 'unpaid' || !booking.paymentStatus) && (
+                              <>
+                                <button
+                                  onClick={() => handlePaymentStatusChange(booking.id, 'deposit_paid')}
+                                  className="flex items-center gap-1 px-3 py-1.5 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors"
+                                  title="Označit zálohu jako zaplacenou a odeslat email"
+                                >
+                                  <Check className="w-4 h-4" />
+                                  Záloha zaplacena
+                                </button>
+                                <button
+                                  onClick={() => handlePaymentStatusChange(booking.id, 'fully_paid')}
+                                  className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition-colors"
+                                  title="Označit jako plně zaplaceno a odeslat email"
+                                >
+                                  <Check className="w-4 h-4" />
+                                  Zaplaceno celé
+                                </button>
+                              </>
+                            )}
+                            {booking.paymentStatus === 'deposit_paid' && (
+                              <button
+                                onClick={() => handlePaymentStatusChange(booking.id, 'fully_paid')}
+                                className="flex items-center gap-1 px-3 py-1.5 bg-green-500 text-white text-sm rounded hover:bg-green-600 transition-colors"
+                                title="Označit zbytek jako zaplacený a odeslat email"
+                              >
+                                <Check className="w-4 h-4" />
+                                Doplacen zbytek
+                              </button>
+                            )}
+                            {booking.paymentStatus === 'fully_paid' && (
+                              <span className="text-sm text-green-600 font-semibold">
+                                ✅ Vše zaplaceno
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
