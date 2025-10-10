@@ -91,6 +91,7 @@ export async function getAllBookings(): Promise<BookingDocument[]> {
 
 /**
  * Get bookings by date range (for checking availability)
+ * Includes +1 day after checkout for cleaning
  */
 export async function getBookingsByDateRange(startDate: string, endDate: string): Promise<BookingDocument[]> {
   try {
@@ -112,9 +113,14 @@ export async function getBookingsByDateRange(startDate: string, endDate: string)
         createdAt: data.createdAt?.toDate() || new Date(),
       } as BookingDocument;
 
+      // Add 1 day after checkout for cleaning
+      const checkOutDate = new Date(booking.checkOut);
+      checkOutDate.setDate(checkOutDate.getDate() + 1);
+      const checkOutWithCleaning = checkOutDate.toISOString().split('T')[0];
+
       // Check if booking overlaps with the requested date range
-      // Overlap occurs if: booking.checkIn <= endDate AND booking.checkOut >= startDate
-      if (booking.checkIn <= endDate && booking.checkOut >= startDate) {
+      // Overlap occurs if: booking.checkIn <= endDate AND (checkOut + 1 day) >= startDate
+      if (booking.checkIn <= endDate && checkOutWithCleaning >= startDate) {
         bookings.push(booking);
       }
     });
@@ -171,6 +177,7 @@ export async function getBookingsByEmail(email: string): Promise<BookingDocument
 
 /**
  * Get all occupied dates (for calendar display)
+ * Includes +1 day after checkout for cleaning
  */
 export async function getOccupiedDates(): Promise<string[]> {
   try {
@@ -187,9 +194,13 @@ export async function getOccupiedDates(): Promise<string[]> {
       const checkIn = new Date(data.checkIn);
       const checkOut = new Date(data.checkOut);
 
-      // Add all dates between checkIn and checkOut (inclusive)
+      // Add 1 day after checkout for cleaning
+      const cleaningDay = new Date(checkOut);
+      cleaningDay.setDate(cleaningDay.getDate() + 1);
+
+      // Add all dates between checkIn and checkOut + 1 day (inclusive)
       const currentDate = new Date(checkIn);
-      while (currentDate <= checkOut) {
+      while (currentDate <= cleaningDay) {
         occupiedDates.add(currentDate.toISOString().split('T')[0]);
         currentDate.setDate(currentDate.getDate() + 1);
       }

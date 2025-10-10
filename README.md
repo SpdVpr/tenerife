@@ -7,6 +7,7 @@ Moderní webová prezentace luxusního apartmánu v Los Gigantes, Tenerife s pln
 - **Responzivní design** - Optimalizováno pro mobil, tablet i desktop
 - **Rezervační systém** - Integrovaný s Firebase/Firestore
 - **📧 Automatické emaily** - Potvrzení rezervace pro hosty + notifikace pro majitele
+- **🧹 Automatický úklid** - Blokování +1 den po odjezdu pro úklid apartmánu
 - **Galerie** - 32 optimalizovaných fotografií s lightboxem a filtrováním
 - **Kalendář dostupnosti** - Vizuální zobrazení volných termínů
 - **Guest Book** - Kompletní průvodce pro hosty (12 sekcí)
