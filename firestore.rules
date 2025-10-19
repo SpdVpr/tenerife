@@ -5,14 +5,32 @@ service cloud.firestore {
     match /bookings/{bookingId} {
       // Allow read for everyone (needed for availability check and admin panel)
       allow read: if true;
-      
-      // Allow create for everyone (public booking form)
-      allow create: if request.resource.data.keys().hasAll([
-        'checkIn', 'checkOut', 'guests', 'firstName', 'lastName', 
-        'email', 'phone', 'nights', 'totalPrice', 'pricePerNight', 
-        'status', 'createdAt'
-      ]) && request.resource.data.status == 'pending';
-      
+
+      // Allow create for everyone (public booking form + iCal sync)
+      allow create: if
+        // Required fields for all bookings
+        request.resource.data.keys().hasAll([
+          'checkIn', 'checkOut', 'status', 'createdAt'
+        ]) &&
+        (
+          // Public booking form (from website)
+          (
+            request.resource.data.keys().hasAll([
+              'guests', 'firstName', 'lastName', 'email', 'phone',
+              'nights', 'totalPrice', 'pricePerNight'
+            ]) &&
+            request.resource.data.status == 'pending'
+          ) ||
+          // iCal sync (from Booking.com or other platforms)
+          (
+            request.resource.data.keys().hasAll([
+              'source', 'externalId', 'syncedAt'
+            ]) &&
+            request.resource.data.status == 'confirmed' &&
+            request.resource.data.source in ['booking.com', 'beds24', 'airbnb']
+          )
+        );
+
       // Allow update/delete for everyone (TODO: add auth for admin only)
       allow update, delete: if true;
     }

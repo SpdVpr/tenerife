@@ -12,6 +12,8 @@ import { Calendar, Users, Mail, Phone, Clock, Euro, Loader2, Check, X, Trash2, R
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { useRouter } from 'next/navigation';
+import AdminAvailabilityCalendar from '@/components/admin/AdminAvailabilityCalendar';
+import ICalIntegration from '@/components/admin/ICalIntegration';
 
 // Disable static generation for this page
 export const dynamic = 'force-dynamic';
@@ -20,6 +22,7 @@ export default function AdminPage() {
   const [bookings, setBookings] = useState<BookingDocument[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState<'bookings' | 'calendar' | 'ical'>('bookings');
   const router = useRouter();
 
   useEffect(() => {
@@ -201,21 +204,25 @@ export default function AdminPage() {
           <div className="mb-8 flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold text-gray-900 mb-2">
-                Admin Panel - Rezervace
+                Admin Panel
               </h1>
               <p className="text-gray-600">
-                Přehled všech rezervací apartmánu Cielo Dorado
+                {activeTab === 'bookings' && 'Přehled všech rezervací apartmánu Cielo Dorado'}
+                {activeTab === 'calendar' && 'Kombinovaný kalendář - web + Booking.com'}
+                {activeTab === 'ical' && 'Přímá synchronizace s Booking.com přes iCal kalendáře'}
               </p>
             </div>
             <div className="flex items-center space-x-4">
-              <button
-                onClick={loadBookings}
-                disabled={isLoading}
-              className="flex items-center gap-2 px-4 py-2 bg-primary-blue text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
-            >
-              <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
-              Obnovit
-            </button>
+              {activeTab === 'bookings' && (
+                <button
+                  onClick={loadBookings}
+                  disabled={isLoading}
+                className="flex items-center gap-2 px-4 py-2 bg-primary-blue text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50"
+              >
+                <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
+                Obnovit
+              </button>
+              )}
               <button
                 onClick={handleLogout}
                 className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
@@ -226,23 +233,63 @@ export default function AdminPage() {
             </div>
           </div>
 
-          {/* Loading State */}
-          {isLoading && (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 text-primary-blue animate-spin" />
-              <span className="ml-3 text-gray-600">Načítám rezervace...</span>
-            </div>
-          )}
+          {/* Tabs */}
+          <div className="mb-8 flex gap-2 border-b border-gray-200 overflow-x-auto">
+            <button
+              onClick={() => setActiveTab('bookings')}
+              className={`flex items-center gap-2 px-4 py-3 font-semibold border-b-2 transition-colors whitespace-nowrap ${
+                activeTab === 'bookings'
+                  ? 'border-primary-blue text-primary-blue'
+                  : 'border-transparent text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <Calendar className="w-5 h-5" />
+              Rezervace
+            </button>
+            <button
+              onClick={() => setActiveTab('calendar')}
+              className={`flex items-center gap-2 px-4 py-3 font-semibold border-b-2 transition-colors whitespace-nowrap ${
+                activeTab === 'calendar'
+                  ? 'border-primary-blue text-primary-blue'
+                  : 'border-transparent text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <Calendar className="w-5 h-5" />
+              Kalendář
+            </button>
+            <button
+              onClick={() => setActiveTab('ical')}
+              className={`flex items-center gap-2 px-4 py-3 font-semibold border-b-2 transition-colors whitespace-nowrap ${
+                activeTab === 'ical'
+                  ? 'border-primary-blue text-primary-blue'
+                  : 'border-transparent text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <Calendar className="w-5 h-5" />
+              iCal Sync
+            </button>
+          </div>
 
-          {/* Error State */}
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-              <p className="text-red-700">{error}</p>
-            </div>
-          )}
+          {/* Bookings Tab Content */}
+          {activeTab === 'bookings' && (
+            <>
+              {/* Loading State */}
+              {isLoading && (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="w-8 h-8 text-primary-blue animate-spin" />
+                  <span className="ml-3 text-gray-600">Načítám rezervace...</span>
+                </div>
+              )}
 
-          {/* Bookings List */}
-          {!isLoading && !error && (
+              {/* Error State */}
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                  <p className="text-red-700">{error}</p>
+                </div>
+              )}
+
+              {/* Bookings List */}
+              {!isLoading && !error && (
             <>
               {/* Stats */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -482,6 +529,30 @@ export default function AdminPage() {
                 </div>
               )}
             </>
+              )}
+            </>
+          )}
+
+          {/* Calendar Tab Content */}
+          {activeTab === 'calendar' && (
+            <div className="space-y-8">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">📅 Kombinovaný kalendář</h2>
+                <p className="text-gray-600 mb-6">
+                  Přehled obsazených dní z obou zdrojů - web rezervace a Booking.com
+                </p>
+              </div>
+
+              {/* Calendar */}
+              <div className="bg-white rounded-lg shadow p-6">
+                <AdminAvailabilityCalendar />
+              </div>
+            </div>
+          )}
+
+          {/* iCal Tab Content */}
+          {activeTab === 'ical' && (
+            <ICalIntegration />
           )}
         </div>
       </main>

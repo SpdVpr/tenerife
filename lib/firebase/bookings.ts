@@ -252,6 +252,60 @@ export async function getOccupiedDates(): Promise<string[]> {
 }
 
 /**
+ * Get occupied dates with source information (for admin calendar)
+ * Returns dates grouped by source: web, booking.com, beds24, etc.
+ */
+export interface OccupiedDateWithSource {
+  date: string;
+  sources: string[]; // e.g., ['web', 'booking.com']
+}
+
+export async function getOccupiedDatesWithSource(): Promise<OccupiedDateWithSource[]> {
+  try {
+    const q = query(
+      collection(db, BOOKINGS_COLLECTION),
+      where('status', '!=', 'cancelled')
+    );
+
+    const querySnapshot = await getDocs(q);
+    const dateSourceMap = new Map<string, Set<string>>();
+
+    querySnapshot.forEach((doc) => {
+      const data = doc.data() as DocumentData;
+      const checkIn = new Date(data.checkIn);
+      const checkOut = new Date(data.checkOut);
+      const source = data.source || 'web'; // Default to 'web' if no source specified
+
+      // Add 1 day after checkout for cleaning
+      const cleaningDay = new Date(checkOut);
+      cleaningDay.setDate(cleaningDay.getDate() + 1);
+
+      // Add all dates between checkIn and checkOut + 1 day (inclusive)
+      const currentDate = new Date(checkIn);
+      while (currentDate <= cleaningDay) {
+        const dateStr = currentDate.toISOString().split('T')[0];
+
+        if (!dateSourceMap.has(dateStr)) {
+          dateSourceMap.set(dateStr, new Set());
+        }
+        dateSourceMap.get(dateStr)!.add(source);
+
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+    });
+
+    // Convert map to array
+    return Array.from(dateSourceMap.entries()).map(([date, sources]) => ({
+      date,
+      sources: Array.from(sources)
+    }));
+  } catch (error) {
+    console.error('Error getting occupied dates with source:', error);
+    return [];
+  }
+}
+
+/**
  * Update booking status
  */
 export async function updateBookingStatus(
