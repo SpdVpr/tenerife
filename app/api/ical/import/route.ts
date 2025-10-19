@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { collection, getDocs, addDoc, query, where, Timestamp } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
-import { parseICalContent, getDatesBetween } from '@/lib/ical';
+import { parseICalContent } from '@/lib/ical';
 
 /**
  * POST /api/ical/import
@@ -65,7 +65,6 @@ export async function POST(request: Request) {
 
     let importedCount = 0;
     let skippedCount = 0;
-    let updatedCount = 0;
 
     // Process each event
     for (const event of events) {
@@ -161,7 +160,7 @@ export async function POST(request: Request) {
  * 
  * Test endpoint to check if import is working
  */
-export async function GET(request: Request) {
+export async function GET() {
   return NextResponse.json({
     message: 'iCal Import API',
     usage: 'POST with { "icalUrl": "your-ical-url" }',

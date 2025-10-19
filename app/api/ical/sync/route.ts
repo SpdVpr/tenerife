@@ -105,7 +105,7 @@ export async function POST(request: Request) {
  * 
  * Get sync status and information
  */
-export async function GET(request: Request) {
+export async function GET() {
   const icalUrl = process.env.BOOKING_COM_ICAL_URL;
   const exportUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/ical/export`;
 

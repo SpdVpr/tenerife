@@ -3,11 +3,8 @@
 import { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-import { getOccupiedDatesWithSource, type OccupiedDateWithSource } from '@/lib/firebase/bookings';
+import { getOccupiedDatesWithSource } from '@/lib/firebase/bookings';
 import { Loader2, RefreshCw } from 'lucide-react';
-
-type ValuePiece = Date | null;
-type Value = ValuePiece | [ValuePiece, ValuePiece];
 
 interface DateInfo {
   date: string;

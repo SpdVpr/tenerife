@@ -3,6 +3,18 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase/config';
 import { generateICalContent, bookingToICalEvent } from '@/lib/ical';
 
+interface BookingData {
+  id: string;
+  checkIn: string;
+  checkOut: string;
+  firstName: string;
+  lastName: string;
+  status: string;
+  source?: string;
+  createdAt?: { toDate?: () => Date };
+  [key: string]: unknown;
+}
+
 /**
  * GET /api/ical/export
  * 
@@ -14,7 +26,7 @@ import { generateICalContent, bookingToICalEvent } from '@/lib/ical';
  * 2. In Booking.com extranet, go to Calendar > Calendar sync
  * 3. Paste the URL to import your bookings to Booking.com
  */
-export async function GET(request: Request) {
+export async function GET() {
   try {
     console.log('📅 iCal Export: Fetching confirmed bookings from Firebase...');
     
@@ -25,15 +37,18 @@ export async function GET(request: Request) {
     );
 
     const bookingsSnapshot = await getDocs(bookingsQuery);
-    const bookings = bookingsSnapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data()
-    }));
+    const bookings: BookingData[] = bookingsSnapshot.docs.map(doc => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        ...data
+      } as BookingData;
+    });
 
     console.log(`📅 iCal Export: Found ${bookings.length} confirmed bookings`);
 
     // Filter out bookings that came from external sources (to avoid circular sync)
-    const webBookings = bookings.filter((booking: any) => {
+    const webBookings = bookings.filter((booking) => {
       // Only export bookings from web or without source
       return !booking.source || booking.source === 'web';
     });
@@ -41,7 +56,7 @@ export async function GET(request: Request) {
     console.log(`📅 iCal Export: Exporting ${webBookings.length} web bookings (excluding external)`);
 
     // Convert bookings to iCal events
-    const events = webBookings.map((booking: any) => 
+    const events = webBookings.map((booking) =>
       bookingToICalEvent({
         id: booking.id,
         checkIn: booking.checkIn,

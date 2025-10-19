@@ -73,7 +73,6 @@ export function parseICalContent(icalContent: string): ICalEvent[] {
   const lines = icalContent.split(/\r?\n/);
   
   let currentEvent: Partial<ICalEvent> | null = null;
-  let currentProperty = '';
   
   for (let i = 0; i < lines.length; i++) {
     let line = lines[i].trim();

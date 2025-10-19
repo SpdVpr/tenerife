@@ -1,14 +1,14 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Calendar, Download, Upload, RefreshCw, CheckCircle, XCircle, Clock, Link as LinkIcon, Copy, Check } from 'lucide-react';
+import { Download, Upload, RefreshCw, CheckCircle, XCircle, Clock, Link as LinkIcon, Copy, Check } from 'lucide-react';
 
 interface SyncLog {
   timestamp: string;
   type: 'sync' | 'import' | 'export';
   status: 'success' | 'error';
   message: string;
-  details?: any;
+  details?: Record<string, unknown>;
 }
 
 export default function ICalIntegration() {
@@ -30,7 +30,7 @@ export default function ICalIntegration() {
     }
   }, []);
 
-  const addLog = (type: SyncLog['type'], status: SyncLog['status'], message: string, details?: any) => {
+  const addLog = (type: SyncLog['type'], status: SyncLog['status'], message: string, details?: Record<string, unknown>) => {
     const log: SyncLog = {
       timestamp: new Date().toISOString(),
       type,
@@ -114,7 +114,7 @@ export default function ICalIntegration() {
     try {
       window.open(exportUrl, '_blank');
       addLog('export', 'success', 'Export kalendáře otevřen v novém okně');
-    } catch (err) {
+    } catch {
       addLog('export', 'error', 'Chyba při otevření exportu');
     }
   };
