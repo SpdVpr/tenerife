@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { addSyncLog } from '@/lib/firebase/syncLogs';
 
 /**
  * POST /api/ical/sync
@@ -72,6 +73,20 @@ export async function POST(request: Request) {
 
     const duration = Date.now() - startTime;
 
+    // Save sync log to Firebase
+    await addSyncLog({
+      timestamp: new Date(),
+      type: 'sync',
+      status: 'success',
+      message: `Synchronizace dokončena: ${importResult.imported} importováno, ${importResult.skipped} přeskočeno`,
+      details: {
+        imported: importResult.imported,
+        skipped: importResult.skipped,
+        total: importResult.total,
+        duration: `${duration}ms`,
+      },
+    });
+
     return NextResponse.json({
       success: true,
       message: 'Synchronizace dokončena',
@@ -89,6 +104,18 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error('❌ Sync error:', error);
+
+    // Save error log to Firebase
+    await addSyncLog({
+      timestamp: new Date(),
+      type: 'sync',
+      status: 'error',
+      message: 'Chyba při synchronizaci',
+      details: {
+        error: error instanceof Error ? error.message : 'Neznámá chyba',
+      },
+    });
+
     return NextResponse.json(
       {
         success: false,

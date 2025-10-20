@@ -2,14 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Download, Upload, RefreshCw, CheckCircle, XCircle, Clock, Link as LinkIcon, Copy, Check } from 'lucide-react';
-
-interface SyncLog {
-  timestamp: string;
-  type: 'sync' | 'import' | 'export';
-  status: 'success' | 'error';
-  message: string;
-  details?: Record<string, unknown>;
-}
+import { getSyncLogs, type SyncLog } from '@/lib/firebase/syncLogs';
 
 export default function ICalIntegration() {
   const [icalUrl, setICalUrl] = useState('');
@@ -22,28 +15,30 @@ export default function ICalIntegration() {
     // Set export URL
     const baseUrl = window.location.origin;
     setExportUrl(`${baseUrl}/api/ical/export`);
-    
+
     // Load saved iCal URL from localStorage
     const savedUrl = localStorage.getItem('booking_com_ical_url');
     if (savedUrl) {
       setICalUrl(savedUrl);
     }
+
+    // Load sync logs from Firebase
+    loadSyncLogs();
   }, []);
 
-  const addLog = (type: SyncLog['type'], status: SyncLog['status'], message: string, details?: Record<string, unknown>) => {
-    const log: SyncLog = {
-      timestamp: new Date().toISOString(),
-      type,
-      status,
-      message,
-      details,
-    };
-    setSyncLogs(prev => [log, ...prev.slice(0, 9)]); // Keep last 10 logs
+  const loadSyncLogs = async () => {
+    try {
+      const logs = await getSyncLogs(50); // Load last 50 logs
+      setSyncLogs(logs);
+      console.log('📋 Loaded sync logs:', logs.length);
+    } catch (error) {
+      console.error('❌ Error loading sync logs:', error);
+    }
   };
 
   const handleSync = async () => {
     if (!icalUrl) {
-      addLog('sync', 'error', 'Prosím zadejte iCal URL z Booking.com');
+      alert('Prosím zadejte iCal URL z Booking.com');
       return;
     }
 
@@ -61,63 +56,21 @@ export default function ICalIntegration() {
       const data = await response.json();
 
       if (response.ok && data.success) {
-        addLog('sync', 'success', 
-          `Synchronizace dokončena: ${data.import.imported} importováno, ${data.import.skipped} přeskočeno`,
-          data
-        );
+        // Reload logs from Firebase to show the new entry
+        await loadSyncLogs();
+        alert(`✅ Synchronizace dokončena: ${data.import.imported} importováno, ${data.import.skipped} přeskočeno`);
       } else {
-        addLog('sync', 'error', `Chyba: ${data.message || 'Neznámá chyba'}`, data);
+        alert(`❌ Chyba: ${data.message || 'Neznámá chyba'}`);
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Neznámá chyba';
-      addLog('sync', 'error', `Chyba: ${errorMessage}`);
+      alert(`❌ Chyba: ${errorMessage}`);
     } finally {
       setIsSyncing(false);
     }
   };
 
-  const handleImport = async () => {
-    if (!icalUrl) {
-      addLog('import', 'error', 'Prosím zadejte iCal URL z Booking.com');
-      return;
-    }
 
-    setIsSyncing(true);
-    try {
-      localStorage.setItem('booking_com_ical_url', icalUrl);
-
-      const response = await fetch('/api/ical/import', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ icalUrl }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        addLog('import', 'success', 
-          `Import dokončen: ${data.imported} importováno, ${data.skipped} přeskočeno`,
-          data
-        );
-      } else {
-        addLog('import', 'error', `Chyba: ${data.message || 'Neznámá chyba'}`, data);
-      }
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Neznámá chyba';
-      addLog('import', 'error', `Chyba: ${errorMessage}`);
-    } finally {
-      setIsSyncing(false);
-    }
-  };
-
-  const handleTestExport = async () => {
-    try {
-      window.open(exportUrl, '_blank');
-      addLog('export', 'success', 'Export kalendáře otevřen v novém okně');
-    } catch {
-      addLog('export', 'error', 'Chyba při otevření exportu');
-    }
-  };
 
   const copyToClipboard = async (text: string) => {
     try {
@@ -175,12 +128,6 @@ export default function ICalIntegration() {
             {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
             <span>{copied ? 'Zkopírováno' : 'Kopírovat'}</span>
           </button>
-          <button
-            onClick={handleTestExport}
-            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            Test
-          </button>
         </div>
       </div>
 
@@ -209,24 +156,6 @@ export default function ICalIntegration() {
 
           <div className="flex space-x-2">
             <button
-              onClick={handleImport}
-              disabled={isSyncing || !icalUrl}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
-            >
-              {isSyncing ? (
-                <>
-                  <RefreshCw className="w-4 h-4 animate-spin" />
-                  <span>Importuji...</span>
-                </>
-              ) : (
-                <>
-                  <Upload className="w-4 h-4" />
-                  <span>Importovat nyní</span>
-                </>
-              )}
-            </button>
-
-            <button
               onClick={handleSync}
               disabled={isSyncing || !icalUrl}
               className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center space-x-2"
@@ -249,9 +178,18 @@ export default function ICalIntegration() {
 
       {/* Sync Logs */}
       <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex items-center space-x-2 mb-4">
-          <Clock className="w-5 h-5 text-gray-600" />
-          <h3 className="text-lg font-semibold text-gray-900">Historie synchronizace</h3>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-2">
+            <Clock className="w-5 h-5 text-gray-600" />
+            <h3 className="text-lg font-semibold text-gray-900">Historie synchronizace</h3>
+          </div>
+          <button
+            onClick={loadSyncLogs}
+            className="px-3 py-1 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors flex items-center space-x-1"
+          >
+            <RefreshCw className="w-4 h-4" />
+            <span>Obnovit</span>
+          </button>
         </div>
 
         {syncLogs.length === 0 ? (
@@ -279,7 +217,9 @@ export default function ICalIntegration() {
                         {log.type === 'sync' ? '🔄 Synchronizace' : log.type === 'import' ? '📥 Import' : '📤 Export'}
                       </span>
                       <span className="text-xs text-gray-500">
-                        {new Date(log.timestamp).toLocaleString('cs-CZ')}
+                        {log.timestamp instanceof Date
+                          ? log.timestamp.toLocaleString('cs-CZ')
+                          : new Date(log.timestamp).toLocaleString('cs-CZ')}
                       </span>
                     </div>
                     <p className="text-sm text-gray-700 mt-1">{log.message}</p>

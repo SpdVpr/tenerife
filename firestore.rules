@@ -34,6 +34,23 @@ service cloud.firestore {
       // Allow update/delete for everyone (TODO: add auth for admin only)
       allow update, delete: if true;
     }
+
+    // Sync logs collection
+    match /syncLogs/{logId} {
+      // Allow read for everyone (needed for admin panel)
+      allow read: if true;
+
+      // Allow create for everyone (needed for API endpoints)
+      allow create: if
+        request.resource.data.keys().hasAll([
+          'timestamp', 'type', 'status', 'message'
+        ]) &&
+        request.resource.data.type in ['sync', 'import', 'export'] &&
+        request.resource.data.status in ['success', 'error'];
+
+      // No updates or deletes allowed
+      allow update, delete: if false;
+    }
   }
 }
 
