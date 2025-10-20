@@ -211,26 +211,26 @@ export default function AdminAvailabilityCalendar() {
 
           /* Web bookings only */
           .occupied-web {
-            background-color: #fee2e2;
-            color: #991b1b;
+            background-color: #ef4444 !important;
+            color: white !important;
             cursor: not-allowed;
-            opacity: 0.7;
+            font-weight: 600;
           }
 
           /* Booking.com bookings only */
           .occupied-booking {
-            background-color: #bfdbfe;
-            color: #1e40af;
+            background-color: #3b82f6 !important;
+            color: white !important;
             cursor: not-allowed;
-            opacity: 0.7;
+            font-weight: 600;
           }
 
           /* Multiple sources */
           .occupied-multiple {
-            background: linear-gradient(135deg, #fee2e2 50%, #bfdbfe 50%);
-            color: #7c2d12;
+            background: linear-gradient(135deg, #ef4444 50%, #3b82f6 50%) !important;
+            color: white !important;
             cursor: not-allowed;
-            opacity: 0.8;
+            font-weight: 600;
           }
 
           .past-date {
@@ -238,7 +238,13 @@ export default function AdminAvailabilityCalendar() {
             cursor: not-allowed;
           }
 
-          .react-calendar__tile:disabled {
+          .react-calendar__tile:disabled.occupied-web,
+          .react-calendar__tile:disabled.occupied-booking,
+          .react-calendar__tile:disabled.occupied-multiple {
+            opacity: 1;
+          }
+
+          .react-calendar__tile:disabled.past-date {
             background-color: transparent;
             cursor: not-allowed;
           }
@@ -270,18 +276,18 @@ export default function AdminAvailabilityCalendar() {
               <span className="text-gray-700">Dostupné</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-red-200 border border-red-300"></div>
-              <span className="text-gray-700">Web</span>
+              <div className="w-4 h-4 rounded bg-red-500"></div>
+              <span className="text-gray-700">Web rezervace</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-blue-200 border border-blue-300"></div>
+              <div className="w-4 h-4 rounded bg-blue-500"></div>
               <span className="text-gray-700">Booking.com</span>
             </div>
             <div className="flex items-center gap-2">
               <div
-                className="w-4 h-4 rounded border border-gray-300"
+                className="w-4 h-4 rounded"
                 style={{
-                  background: 'linear-gradient(135deg, #fee2e2 50%, #bfdbfe 50%)',
+                  background: 'linear-gradient(135deg, #ef4444 50%, #3b82f6 50%)',
                 }}
               ></div>
               <span className="text-gray-700">Více zdrojů</span>

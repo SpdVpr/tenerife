@@ -232,10 +232,10 @@ export default function AvailabilityCalendar({
         }
 
         .occupied-date {
-          background-color: #fee2e2;
-          color: #991b1b;
+          background-color: #ef4444 !important;
+          color: white !important;
           cursor: not-allowed;
-          opacity: 0.6;
+          font-weight: 600;
         }
 
         .past-date {
@@ -243,7 +243,13 @@ export default function AvailabilityCalendar({
           cursor: not-allowed;
         }
 
-        .react-calendar__tile:disabled {
+        .react-calendar__tile:disabled.occupied-date {
+          background-color: #ef4444 !important;
+          color: white !important;
+          opacity: 1;
+        }
+
+        .react-calendar__tile:disabled.past-date {
           background-color: transparent;
           cursor: not-allowed;
         }
