@@ -98,6 +98,11 @@ export async function POST(request: Request) {
           (checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24)
         );
 
+        // Add +1 day for cleaning after checkout
+        const cleaningDate = new Date(checkOutDate);
+        cleaningDate.setDate(cleaningDate.getDate() + 1);
+        const cleaningDay = cleaningDate.toISOString().split('T')[0];
+
         // Create new booking in Firebase
         await addDoc(collection(db, 'bookings'), {
           firstName: 'Booking.com',
@@ -117,6 +122,7 @@ export async function POST(request: Request) {
           externalId: event.uid,
           source: 'booking.com',
           syncedAt: Timestamp.now(),
+          cleaningDay: cleaningDay, // +1 day after checkout for cleaning
         });
 
         console.log(`✅ Imported booking: ${event.uid} (${event.startDate} - ${event.endDate})`);

@@ -30,6 +30,10 @@ export interface BookingData {
   paymentStatus: 'unpaid' | 'deposit_paid' | 'fully_paid';
   createdAt: Date;
   bookingNumber?: number; // Numeric booking number (variable symbol)
+  cleaningDay?: string; // Extra day after checkout for cleaning (format: YYYY-MM-DD)
+  source?: string; // Source of booking (e.g., 'booking.com', 'web')
+  externalId?: string; // External booking ID (e.g., from Booking.com)
+  syncedAt?: Date; // Last sync timestamp for external bookings
 }
 
 export interface BookingDocument extends BookingData {
