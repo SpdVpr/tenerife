@@ -41,9 +41,9 @@ export async function POST(request: Request) {
     // Step 1: Import from Booking.com
     console.log('📥 Step 1: Importing from Booking.com...');
 
-    // Use absolute URL for server-side fetch
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ||
-                    (request.headers.get('host') ? `http://${request.headers.get('host')}` : 'http://localhost:3000');
+    // ALWAYS use production URL for internal API calls
+    // This prevents issues with preview deployments
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cielodorado-tenerife.eu';
 
     const importResponse = await fetch(`${baseUrl}/api/ical/import`, {
       method: 'POST',
@@ -148,14 +148,22 @@ export async function GET(request: Request) {
     }
 
     console.log('🔄 Starting iCal synchronization (GET)...');
+    console.log('📋 Environment check:', {
+      hasIcalUrl: !!icalUrl,
+      icalUrlPreview: icalUrl ? icalUrl.substring(0, 50) + '...' : 'N/A',
+      baseUrl: process.env.NEXT_PUBLIC_BASE_URL,
+      host: request.headers.get('host'),
+    });
     const startTime = Date.now();
 
     // Step 1: Import from Booking.com
     console.log('📥 Step 1: Importing from Booking.com...');
 
-    // Use absolute URL for server-side fetch
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ||
-                    (request.headers.get('host') ? `https://${request.headers.get('host')}` : 'http://localhost:3000');
+    // ALWAYS use production URL for internal API calls
+    // This prevents issues with preview deployments
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.cielodorado-tenerife.eu';
+
+    console.log('🔗 Using base URL:', baseUrl);
 
     const importResponse = await fetch(`${baseUrl}/api/ical/import`, {
       method: 'POST',
@@ -167,8 +175,13 @@ export async function GET(request: Request) {
 
     if (!importResponse.ok) {
       const errorText = await importResponse.text();
-      console.error('❌ Import response error:', importResponse.status, errorText);
-      throw new Error(`Import request failed: ${importResponse.status} ${importResponse.statusText}`);
+      console.error('❌ Import response error:', {
+        status: importResponse.status,
+        statusText: importResponse.statusText,
+        url: `${baseUrl}/api/ical/import`,
+        errorText: errorText.substring(0, 500),
+      });
+      throw new Error(`Import request failed: ${importResponse.status} ${importResponse.statusText} - ${errorText.substring(0, 200)}`);
     }
 
     const importResult = await importResponse.json();
