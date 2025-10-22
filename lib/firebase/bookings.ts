@@ -344,6 +344,54 @@ export async function updatePaymentStatus(
 }
 
 /**
+ * Update booking details
+ */
+export async function updateBooking(
+  bookingId: string,
+  updates: Partial<BookingData>
+): Promise<void> {
+  try {
+    const bookingRef = doc(db, BOOKINGS_COLLECTION, bookingId);
+
+    // If dates are being updated, recalculate nights and cleaning day
+    if (updates.checkIn || updates.checkOut) {
+      const bookingDoc = await getDoc(bookingRef);
+      if (!bookingDoc.exists()) {
+        throw new Error('Booking not found');
+      }
+
+      const currentData = bookingDoc.data();
+      const checkIn = updates.checkIn || currentData.checkIn;
+      const checkOut = updates.checkOut || currentData.checkOut;
+
+      const checkInDate = new Date(checkIn);
+      const checkOutDate = new Date(checkOut);
+      const nights = Math.ceil((checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24));
+
+      // Calculate cleaning day (1 day after checkout)
+      const cleaningDate = new Date(checkOutDate);
+      cleaningDate.setDate(cleaningDate.getDate() + 1);
+      const cleaningDay = cleaningDate.toISOString().split('T')[0];
+
+      updates.nights = nights;
+      updates.cleaningDay = cleaningDay;
+
+      // Recalculate total price if pricePerNight exists
+      if (updates.pricePerNight !== undefined || currentData.pricePerNight) {
+        const pricePerNight = updates.pricePerNight ?? currentData.pricePerNight;
+        updates.totalPrice = pricePerNight * nights;
+      }
+    }
+
+    await updateDoc(bookingRef, updates);
+    console.log('Booking updated:', bookingId, updates);
+  } catch (error) {
+    console.error('Error updating booking:', error);
+    throw new Error('Failed to update booking');
+  }
+}
+
+/**
  * Delete booking
  */
 export async function deleteBooking(bookingId: string): Promise<void> {

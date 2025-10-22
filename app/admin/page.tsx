@@ -6,14 +6,16 @@ import {
   BookingDocument,
   updateBookingStatus,
   updatePaymentStatus,
+  updateBooking,
   deleteBooking
 } from '@/lib/firebase/bookings';
-import { Calendar, Users, Mail, Phone, Clock, Euro, Loader2, Check, X, Trash2, RefreshCw, LogOut } from 'lucide-react';
+import { Calendar, Users, Mail, Phone, Clock, Euro, Loader2, Check, X, Trash2, RefreshCw, LogOut, Edit } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { useRouter } from 'next/navigation';
 import AdminAvailabilityCalendar from '@/components/admin/AdminAvailabilityCalendar';
 import ICalIntegration from '@/components/admin/ICalIntegration';
+import EditBookingModal from '@/components/admin/EditBookingModal';
 
 // Disable static generation for this page
 export const dynamic = 'force-dynamic';
@@ -23,6 +25,7 @@ export default function AdminPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<'bookings' | 'calendar' | 'ical'>('bookings');
+  const [editingBooking, setEditingBooking] = useState<BookingDocument | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -116,6 +119,23 @@ export default function AdminPage() {
     } catch (err) {
       console.error('Error updating payment status:', err);
       alert('Chyba při změně platebního statusu');
+    }
+  };
+
+  const handleEdit = (booking: BookingDocument) => {
+    setEditingBooking(booking);
+  };
+
+  const handleSaveEdit = async (bookingId: string, updates: Partial<BookingDocument>) => {
+    try {
+      await updateBooking(bookingId, updates);
+      alert('Rezervace byla úspěšně aktualizována!');
+      // Reload bookings
+      await loadBookings();
+      setEditingBooking(null);
+    } catch (err) {
+      console.error('Error updating booking:', err);
+      throw err; // Re-throw to let modal handle it
     }
   };
 
@@ -426,6 +446,15 @@ export default function AdminPage() {
                             Vytvořeno: {booking.createdAt.toLocaleString('cs-CZ')}
                           </div>
                           <div className="flex items-center gap-2 flex-wrap">
+                            {/* Edit Button */}
+                            <button
+                              onClick={() => handleEdit(booking)}
+                              className="flex items-center gap-1 px-3 py-1.5 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors"
+                              title="Upravit rezervaci"
+                            >
+                              <Edit className="w-4 h-4" />
+                              Upravit
+                            </button>
                             {/* Status Buttons */}
                             {booking.status === 'pending' && (
                               <>
@@ -557,6 +586,16 @@ export default function AdminPage() {
         </div>
       </main>
       <Footer />
+
+      {/* Edit Booking Modal */}
+      {editingBooking && (
+        <EditBookingModal
+          booking={editingBooking}
+          isOpen={!!editingBooking}
+          onClose={() => setEditingBooking(null)}
+          onSave={handleSaveEdit}
+        />
+      )}
     </div>
   );
 }
