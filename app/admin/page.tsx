@@ -9,7 +9,7 @@ import {
   updateBooking,
   deleteBooking
 } from '@/lib/firebase/bookings';
-import { Calendar, Users, Mail, Phone, Clock, Euro, Loader2, Check, X, Trash2, RefreshCw, LogOut, Edit } from 'lucide-react';
+import { Calendar, Users, Mail, Phone, Clock, Euro, Loader2, Check, X, Trash2, RefreshCw, LogOut, Edit, ArrowUpDown } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { useRouter } from 'next/navigation';
@@ -20,12 +20,15 @@ import EditBookingModal from '@/components/admin/EditBookingModal';
 // Disable static generation for this page
 export const dynamic = 'force-dynamic';
 
+type SortOption = 'checkIn' | 'createdAt';
+
 export default function AdminPage() {
   const [bookings, setBookings] = useState<BookingDocument[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<'bookings' | 'calendar' | 'ical'>('bookings');
   const [editingBooking, setEditingBooking] = useState<BookingDocument | null>(null);
+  const [sortBy, setSortBy] = useState<SortOption>('checkIn');
   const router = useRouter();
 
   useEffect(() => {
@@ -153,6 +156,17 @@ export default function AdminPage() {
       alert('Chyba při mazání rezervace');
     }
   };
+
+  // Sort bookings based on selected option
+  const sortedBookings = [...bookings].sort((a, b) => {
+    if (sortBy === 'checkIn') {
+      // Sort by check-in date (ascending - earliest first)
+      return new Date(a.checkIn).getTime() - new Date(b.checkIn).getTime();
+    } else {
+      // Sort by creation date (descending - newest first)
+      return b.createdAt.getTime() - a.createdAt.getTime();
+    }
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -353,8 +367,28 @@ export default function AdminPage() {
                   <p className="text-gray-600">Zatím žádné rezervace</p>
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {bookings.map((booking) => (
+                <>
+                  {/* Sort Controls */}
+                  <div className="bg-white rounded-lg shadow p-4 mb-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <ArrowUpDown className="w-5 h-5 text-gray-600" />
+                        <span className="text-sm font-medium text-gray-700">Řazení:</span>
+                      </div>
+                      <select
+                        value={sortBy}
+                        onChange={(e) => setSortBy(e.target.value as SortOption)}
+                        className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent text-sm"
+                      >
+                        <option value="checkIn">Podle data ubytování (nejbližší první)</option>
+                        <option value="createdAt">Podle data vytvoření (nejnovější první)</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Bookings List */}
+                  <div className="space-y-4">
+                  {sortedBookings.map((booking) => (
                     <div
                       key={booking.id}
                       className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6"
@@ -555,7 +589,8 @@ export default function AdminPage() {
                       </div>
                     </div>
                   ))}
-                </div>
+                  </div>
+                </>
               )}
             </>
               )}
