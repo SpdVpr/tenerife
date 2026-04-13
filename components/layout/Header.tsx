@@ -13,6 +13,7 @@ const navigation = [
   { key: 'nav.pricing', href: '/#pricing', isAnchor: false },
   { key: 'nav.booking', href: '/#booking', isAnchor: false },
   { key: 'nav.location', href: '/#location', isAnchor: false },
+  { key: 'nav.reviews', href: '/#reviews', isAnchor: false },
   { key: 'nav.guestbook', href: '/guest-book', isAnchor: false },
   { key: 'nav.contact', href: '/#contact', isAnchor: false },
 ];

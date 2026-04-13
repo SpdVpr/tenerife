@@ -38,18 +38,12 @@ export async function POST(request: Request) {
     // Fetch iCal content from URL
     const response = await fetch(icalUrl, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; Cielo-Dorado-Calendar-Sync/1.0)',
-        'Accept': 'text/calendar, text/plain, */*',
+        'User-Agent': 'Cielo-Dorado-Calendar-Sync/1.0',
       },
     });
 
     if (!response.ok) {
-      console.error('❌ iCal fetch failed:', {
-        status: response.status,
-        statusText: response.statusText,
-        url: icalUrl.substring(0, 50) + '...',
-      });
-      throw new Error(`Failed to fetch iCal: ${response.status} ${response.statusText}`);
+      throw new Error(`Failed to fetch iCal: ${response.statusText}`);
     }
 
     const icalContent = await response.text();

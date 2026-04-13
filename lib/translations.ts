@@ -9,6 +9,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'nav.pricing': 'Ceník',
     'nav.booking': 'Rezervace',
     'nav.location': 'Lokalita',
+    'nav.reviews': 'Recenze',
     'nav.guestbook': 'Guest Book',
     'nav.contact': 'Kontakt',
 
@@ -213,6 +214,22 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.contact': 'Kontakt',
     'footer.followUs': 'Sledujte nás',
     'footer.rights': 'Všechna práva vyhrazena.',
+
+    // Reviews
+    'reviews.title': 'Co říkají naši hosté',
+    'reviews.subtitle': 'Přečtěte si recenze od spokojených hostů',
+    'reviews.noReviews': 'Zatím žádné recenze',
+    'reviews.writeReview': 'Napsat recenzi',
+    'reviews.rating': 'Hodnocení',
+    'reviews.comment': 'Komentář',
+    'reviews.name': 'Vaše jméno',
+    'reviews.submit': 'Odeslat recenzi',
+    'reviews.submitting': 'Odesílám...',
+    'reviews.success': 'Recenze odeslána!',
+    'reviews.successMessage': 'Děkujeme za vaši recenzi. Po schválení se zobrazí na webu.',
+    'reviews.error': 'Chyba při odesílání recenze',
+    'reviews.stay': 'Pobyt',
+    'reviews.verified': 'Ověřený host',
   },
   en: {
     // Navigation
@@ -222,6 +239,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'nav.pricing': 'Pricing',
     'nav.booking': 'Booking',
     'nav.location': 'Location',
+    'nav.reviews': 'Reviews',
     'nav.guestbook': 'Guest Book',
     'nav.contact': 'Contact',
 
@@ -426,6 +444,22 @@ export const translations: Record<Language, Record<string, string>> = {
     'footer.contact': 'Contact',
     'footer.followUs': 'Follow Us',
     'footer.rights': 'All rights reserved.',
+
+    // Reviews
+    'reviews.title': 'What Our Guests Say',
+    'reviews.subtitle': 'Read reviews from our satisfied guests',
+    'reviews.noReviews': 'No reviews yet',
+    'reviews.writeReview': 'Write a Review',
+    'reviews.rating': 'Rating',
+    'reviews.comment': 'Comment',
+    'reviews.name': 'Your name',
+    'reviews.submit': 'Submit Review',
+    'reviews.submitting': 'Submitting...',
+    'reviews.success': 'Review Submitted!',
+    'reviews.successMessage': 'Thank you for your review. It will appear on the website after approval.',
+    'reviews.error': 'Error submitting review',
+    'reviews.stay': 'Stay',
+    'reviews.verified': 'Verified guest',
   },
 };
 

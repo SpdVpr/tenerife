@@ -8,7 +8,6 @@ import {
   updateDoc,
   query,
   where,
-  orderBy,
   Timestamp,
   DocumentData
 } from 'firebase/firestore';
@@ -81,15 +80,11 @@ export async function createReviewWithId(
 
 /**
  * Get all reviews ordered by creation date (for admin)
+ * Sorts in memory to avoid Firestore index requirements
  */
 export async function getAllReviews(): Promise<ReviewDocument[]> {
   try {
-    const q = query(
-      collection(db, REVIEWS_COLLECTION),
-      orderBy('createdAt', 'desc')
-    );
-
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await getDocs(collection(db, REVIEWS_COLLECTION));
     const reviews: ReviewDocument[] = [];
 
     querySnapshot.forEach((docSnap) => {
@@ -101,6 +96,9 @@ export async function getAllReviews(): Promise<ReviewDocument[]> {
         moderatedAt: data.moderatedAt?.toDate() || undefined,
       } as ReviewDocument);
     });
+
+    // Sort by createdAt descending in memory
+    reviews.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
     return reviews;
   } catch (error) {

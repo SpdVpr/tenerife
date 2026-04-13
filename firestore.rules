@@ -35,6 +35,33 @@ service cloud.firestore {
       allow update, delete: if true;
     }
 
+    // Reviews collection
+    match /reviews/{reviewId} {
+      // Public read (approved reviews shown on front page)
+      allow read: if true;
+
+      // Allow create (public form + admin seeding)
+      allow create: if
+        request.resource.data.keys().hasAll([
+          'bookingId', 'guestName', 'guestEmail', 'rating',
+          'comment', 'status', 'checkIn', 'checkOut', 'createdAt'
+        ]) &&
+        request.resource.data.rating >= 1 &&
+        request.resource.data.rating <= 5;
+
+      // Allow update for admin moderation
+      allow update: if true;
+
+      // No deletes
+      allow delete: if false;
+    }
+
+    // Settings collection (admin configuration)
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
     // Sync logs collection
     match /syncLogs/{logId} {
       // Allow read for everyone (needed for admin panel)

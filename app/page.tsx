@@ -6,6 +6,7 @@ import ApartmentDetails from '@/components/sections/ApartmentDetails';
 import Pricing from '@/components/sections/Pricing';
 import Gallery from '@/components/sections/Gallery';
 import Location from '@/components/sections/Location';
+import Reviews from '@/components/sections/Reviews';
 import Booking from '@/components/sections/Booking';
 import Contact from '@/components/sections/Contact';
 
@@ -19,6 +20,7 @@ export default function Home() {
         <ApartmentDetails />
         <Gallery />
         <Location />
+        <Reviews />
         <Pricing />
         <Booking />
         <Contact />
