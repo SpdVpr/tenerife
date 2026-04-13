@@ -282,17 +282,15 @@ export function getFullyPaidEmail(booking: BookingData & { id: string; bookingNu
             </p>
           </div>
 
-          <div style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 15px; margin: 20px 0; border-radius: 5px;">
+          <div style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 20px; margin: 20px 0; border-radius: 5px;">
             <h3 style="margin-top: 0; color: #1e40af;">📍 Informace o příjezdu</h3>
             <p style="margin: 5px 0;">
-              Před Vaším příjezdem Vám zašleme detailní informace o:
+              <strong>2 dny před Vaším příjezdem</strong> obdržíte samostatný email s:
             </p>
-            <ul style="margin: 10px 0; padding-left: 20px;">
-              <li>Adrese apartmánu a GPS souřadnicích</li>
-              <li>Parkování</li>
-              <li>Předání klíčů</li>
-              <li>Check-in proceduře</li>
-              <li>Doporučeních v okolí</li>
+            <ul style="margin: 10px 0; padding-left: 20px; line-height: 1.8;">
+              <li>Přesnou adresou apartmánu a odkazem na mapu</li>
+              <li>Navigací k bytu v budově</li>
+              <li>Kódem a fotkou key boxu pro vyzvednutí klíčů</li>
             </ul>
           </div>
 
@@ -339,12 +337,8 @@ STAV PLATBY:
 Všechny platby byly přijaty. Nemusíte již nic doplácet.
 
 INFORMACE O PŘÍJEZDU:
-Před Vaším příjezdem Vám zašleme detailní informace o:
-- Adrese apartmánu a GPS souřadnicích
-- Parkování
-- Předání klíčů
-- Check-in proceduře
-- Doporučeních v okolí
+2 dny před Vaším příjezdem obdržíte samostatný email s přesnou adresou,
+navigací k bytu a kódem pro key box s klíči.
 
 KONTAKT:
 Email: martin.holann@gmail.com
@@ -361,3 +355,127 @@ Tým Cielo Dorado
   };
 }
 
+// Arrival info email (sent 2 days before check-in)
+export function getArrivalInfoEmail(booking: BookingData & { id: string; bookingNumber: number }): {
+  subject: string;
+  html: string;
+  text: string;
+} {
+  const checkInDate = formatDate(booking.checkIn);
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <style>${emailStyles}</style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header" style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);">
+          <h1>🏖️ Informace o příjezdu</h1>
+          <p style="margin: 10px 0 0 0; font-size: 16px;">Rezervace #${booking.bookingNumber} — příjezd ${checkInDate}</p>
+        </div>
+
+        <div class="content">
+          <p>Dobrý den ${booking.firstName},</p>
+          <p>Těšíme se na Vás! Zde jsou veškeré informace potřebné k Vašemu příjezdu.</p>
+
+          <div style="background: #eff6ff; border-left: 4px solid #3b82f6; padding: 20px; margin: 20px 0; border-radius: 5px;">
+            <h3 style="margin-top: 0; color: #1e40af;">🏠 Adresa apartmánu</h3>
+            <p style="margin: 8px 0; font-size: 16px;">
+              <strong>Av. José González Forte 73</strong><br>
+              38683 Santiago del Teide (Los Gigantes)<br>
+              Tenerife, Španělsko
+            </p>
+            <p style="margin: 12px 0 5px 0;">
+              <a href="https://maps.google.com/?q=Av.+Jose+Gonzalez+Forte+73,+38683+Santiago+del+Teide,+Tenerife" style="background: #1e40af; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: bold;">
+                📍 Otevřít v Google Maps
+              </a>
+            </p>
+          </div>
+
+          <div style="background: #f0fdf4; border-left: 4px solid #059669; padding: 20px; margin: 20px 0; border-radius: 5px;">
+            <h3 style="margin-top: 0; color: #059669;">🚪 Jak najít apartmán</h3>
+            <ol style="margin: 8px 0; padding-left: 20px; line-height: 2;">
+              <li>Vstupte do budovy</li>
+              <li>Jděte k výtahu — <strong>před výtahem odbočte vpravo</strong></li>
+              <li>Pokračujte chodbou <strong>nahoru a doleva</strong></li>
+              <li><strong>Byt č. 5, 1. patro</strong></li>
+            </ol>
+            <div style="margin: 15px 0 5px 0; text-align: center;">
+              <img src="cid:door" alt="Dveře apartmánu č. 5" style="width: 100%; max-width: 400px; border-radius: 8px; display: block; margin: 0 auto;">
+            </div>
+          </div>
+
+          <div style="background: #fefce8; border-left: 4px solid #ca8a04; padding: 20px; margin: 20px 0; border-radius: 5px;">
+            <h3 style="margin-top: 0; color: #92400e;">🔑 Přístup — Key Box</h3>
+            <p style="margin: 5px 0;">Klíče jsou uloženy v schránce (key box) u vchodu do apartmánu.</p>
+            <div style="margin: 12px 0; text-align: center;">
+              <img src="cid:keybox" alt="Key box" style="width: 100%; max-width: 400px; border-radius: 8px; display: block; margin: 0 auto;">
+            </div>
+            <p style="margin: 10px 0 5px 0;"><strong>Kód pro otevření:</strong></p>
+            <div style="background: #1e40af; color: white; font-size: 32px; font-weight: bold; text-align: center; padding: 18px; border-radius: 8px; letter-spacing: 10px; margin: 8px 0;">
+              3377
+            </div>
+            <p style="margin: 10px 0 0 0; font-size: 13px; color: #475569;">
+              ⚠️ Po odjezdu prosím klíče vraťte zpět do key boxu a zavřete ho.
+            </p>
+          </div>
+
+          <div class="contact-info">
+            <h3 style="color: #1e40af;">📞 Kontakt</h3>
+            <p><strong>Email:</strong> info@cielodorado-tenerife.eu</p>
+            <p><strong>Web:</strong> <a href="https://www.cielodorado-tenerife.eu">www.cielodorado-tenerife.eu</a></p>
+          </div>
+
+          <p style="margin-top: 30px;">Přejeme Vám krásný pobyt!</p>
+          <p><strong>Tým Cielo Dorado</strong></p>
+        </div>
+
+        <div class="footer">
+          <p>Tento email byl odeslán automaticky 2 dny před Vaším příjezdem.</p>
+          <p>&copy; ${new Date().getFullYear()} Cielo Dorado Tenerife. Všechna práva vyhrazena.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  const text = `
+INFORMACE O PŘÍJEZDU
+Rezervace #${booking.bookingNumber} — příjezd ${checkInDate}
+
+Dobrý den ${booking.firstName},
+
+Těšíme se na Vás! Zde jsou informace k příjezdu.
+
+ADRESA:
+Av. José González Forte 73
+38683 Santiago del Teide (Los Gigantes), Tenerife, Španělsko
+Google Maps: https://maps.google.com/?q=Av.+Jose+Gonzalez+Forte+73,+38683+Santiago+del+Teide,+Tenerife
+
+JAK NAJÍT APARTMÁN:
+1. Vstupte do budovy
+2. Jděte k výtahu — před výtahem odbočte vpravo
+3. Pokračujte chodbou nahoru a doleva
+4. Byt č. 5, 1. patro
+
+KEY BOX — KÓD: 3377
+Klíče jsou v schránce u vchodu do apartmánu.
+Po odjezdu klíče vraťte zpět do key boxu.
+
+KONTAKT:
+Email: info@cielodorado-tenerife.eu
+Web: www.cielodorado-tenerife.eu
+
+Přejeme Vám krásný pobyt!
+Tým Cielo Dorado
+  `;
+
+  return {
+    subject: `🏖️ Informace o příjezdu #${booking.bookingNumber} — ${checkInDate}`,
+    html,
+    text,
+  };
+}

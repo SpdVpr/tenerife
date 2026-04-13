@@ -4,6 +4,7 @@ import { createEmailTransporter } from '@/lib/email/config';
 import { emailConfig } from '@/lib/email/config';
 import { BookingData } from '@/lib/firebase/bookings';
 
+
 export async function POST(request: NextRequest) {
   try {
     const { booking, paymentType } = await request.json();

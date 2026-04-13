@@ -6,33 +6,30 @@ import {
   BookingDocument,
   updateBookingStatus,
   updatePaymentStatus,
-  updateBooking,
   deleteBooking
 } from '@/lib/firebase/bookings';
-import { Calendar, Users, Mail, Phone, Clock, Euro, Loader2, Check, X, Trash2, RefreshCw, LogOut, Edit, ArrowUpDown } from 'lucide-react';
+import { Calendar, Users, Mail, Phone, Clock, Euro, Loader2, Check, X, Trash2, RefreshCw, LogOut, MessageSquare, Send } from 'lucide-react';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { useRouter } from 'next/navigation';
 import AdminAvailabilityCalendar from '@/components/admin/AdminAvailabilityCalendar';
 import ICalIntegration from '@/components/admin/ICalIntegration';
-import EditBookingModal from '@/components/admin/EditBookingModal';
+import ReviewsAdmin from '@/components/admin/ReviewsAdmin';
 
 // Disable static generation for this page
 export const dynamic = 'force-dynamic';
-
-type SortOption = 'checkIn' | 'createdAt';
 
 export default function AdminPage() {
   const [bookings, setBookings] = useState<BookingDocument[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState<'bookings' | 'calendar' | 'ical'>('bookings');
-  const [editingBooking, setEditingBooking] = useState<BookingDocument | null>(null);
-  const [sortBy, setSortBy] = useState<SortOption>('checkIn');
+  const [activeTab, setActiveTab] = useState<'bookings' | 'calendar' | 'ical' | 'reviews'>('bookings');
   const router = useRouter();
 
   useEffect(() => {
     loadBookings();
+    // Automatically check for bookings that need review request emails (3 days after checkout)
+    fetch('/api/reviews/send-pending', { method: 'POST' }).catch(console.error);
   }, []);
 
   const loadBookings = async () => {
@@ -125,23 +122,6 @@ export default function AdminPage() {
     }
   };
 
-  const handleEdit = (booking: BookingDocument) => {
-    setEditingBooking(booking);
-  };
-
-  const handleSaveEdit = async (bookingId: string, updates: Partial<BookingDocument>) => {
-    try {
-      await updateBooking(bookingId, updates);
-      alert('Rezervace byla úspěšně aktualizována!');
-      // Reload bookings
-      await loadBookings();
-      setEditingBooking(null);
-    } catch (err) {
-      console.error('Error updating booking:', err);
-      throw err; // Re-throw to let modal handle it
-    }
-  };
-
   const handleDelete = async (bookingId: string) => {
     if (!confirm('Opravdu chcete smazat tuto rezervaci?')) {
       return;
@@ -156,17 +136,6 @@ export default function AdminPage() {
       alert('Chyba při mazání rezervace');
     }
   };
-
-  // Sort bookings based on selected option
-  const sortedBookings = [...bookings].sort((a, b) => {
-    if (sortBy === 'checkIn') {
-      // Sort by check-in date (ascending - earliest first)
-      return new Date(a.checkIn).getTime() - new Date(b.checkIn).getTime();
-    } else {
-      // Sort by creation date (descending - newest first)
-      return b.createdAt.getTime() - a.createdAt.getTime();
-    }
-  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -220,6 +189,49 @@ export default function AdminPage() {
     }
   };
 
+  const handleSendArrivalEmail = async (bookingId: string) => {
+    const booking = bookings.find(b => b.id === bookingId);
+    if (!booking) return;
+
+    try {
+      const response = await fetch('/api/send-arrival-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ booking }),
+      });
+
+      if (response.ok) {
+        alert('Email s informacemi o příjezdu byl odeslán!');
+        await loadBookings();
+      } else {
+        const data = await response.json();
+        alert(`Chyba: ${data.error || 'Nepodařilo se odeslat email'}`);
+      }
+    } catch {
+      alert('Chyba při odesílání emailu o příjezdu');
+    }
+  };
+
+  const handleSendReviewRequest = async (bookingId: string) => {
+    try {
+      const response = await fetch('/api/reviews/send-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ bookingId }),
+      });
+
+      if (response.ok) {
+        alert('Email s žádostí o recenzi byl odeslán!');
+        await loadBookings();
+      } else {
+        const data = await response.json();
+        alert(`Chyba: ${data.error || 'Nepodařilo se odeslat email'}`);
+      }
+    } catch {
+      alert('Chyba při odesílání žádosti o recenzi');
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await fetch('/api/admin/logout', { method: 'POST' });
@@ -244,6 +256,7 @@ export default function AdminPage() {
                 {activeTab === 'bookings' && 'Přehled všech rezervací apartmánu Cielo Dorado'}
                 {activeTab === 'calendar' && 'Kombinovaný kalendář - web + Booking.com'}
                 {activeTab === 'ical' && 'Přímá synchronizace s Booking.com přes iCal kalendáře'}
+                {activeTab === 'reviews' && 'Správa recenzí od hostů'}
               </p>
             </div>
             <div className="flex items-center space-x-4">
@@ -301,6 +314,17 @@ export default function AdminPage() {
             >
               <Calendar className="w-5 h-5" />
               iCal Sync
+            </button>
+            <button
+              onClick={() => setActiveTab('reviews')}
+              className={`flex items-center gap-2 px-4 py-3 font-semibold border-b-2 transition-colors whitespace-nowrap ${
+                activeTab === 'reviews'
+                  ? 'border-primary-blue text-primary-blue'
+                  : 'border-transparent text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              <MessageSquare className="w-5 h-5" />
+              Recenze
             </button>
           </div>
 
@@ -367,28 +391,8 @@ export default function AdminPage() {
                   <p className="text-gray-600">Zatím žádné rezervace</p>
                 </div>
               ) : (
-                <>
-                  {/* Sort Controls */}
-                  <div className="bg-white rounded-lg shadow p-4 mb-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <ArrowUpDown className="w-5 h-5 text-gray-600" />
-                        <span className="text-sm font-medium text-gray-700">Řazení:</span>
-                      </div>
-                      <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value as SortOption)}
-                        className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-blue focus:border-transparent text-sm"
-                      >
-                        <option value="checkIn">Podle data ubytování (nejbližší první)</option>
-                        <option value="createdAt">Podle data vytvoření (nejnovější první)</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Bookings List */}
-                  <div className="space-y-4">
-                  {sortedBookings.map((booking) => (
+                <div className="space-y-4">
+                  {bookings.map((booking) => (
                     <div
                       key={booking.id}
                       className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6"
@@ -480,15 +484,6 @@ export default function AdminPage() {
                             Vytvořeno: {booking.createdAt.toLocaleString('cs-CZ')}
                           </div>
                           <div className="flex items-center gap-2 flex-wrap">
-                            {/* Edit Button */}
-                            <button
-                              onClick={() => handleEdit(booking)}
-                              className="flex items-center gap-1 px-3 py-1.5 bg-blue-500 text-white text-sm rounded hover:bg-blue-600 transition-colors"
-                              title="Upravit rezervaci"
-                            >
-                              <Edit className="w-4 h-4" />
-                              Upravit
-                            </button>
                             {/* Status Buttons */}
                             {booking.status === 'pending' && (
                               <>
@@ -548,6 +543,42 @@ export default function AdminPage() {
                             💳 Platební akce:
                           </div>
                           <div className="flex items-center gap-2 flex-wrap">
+                            {/* Arrival info email button */}
+                            {booking.status === 'confirmed' && (
+                              booking.arrivalEmailSent ? (
+                                <span className="text-sm text-blue-600 font-medium flex items-center gap-1">
+                                  <Check className="w-3.5 h-3.5" />
+                                  Příjezd odeslán
+                                </span>
+                              ) : (
+                                <button
+                                  onClick={() => handleSendArrivalEmail(booking.id)}
+                                  className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition-colors"
+                                  title="Odeslat hostovi informace o příjezdu (adresa, klíče)"
+                                >
+                                  <Send className="w-4 h-4" />
+                                  Instrukce k příjezdu
+                                </button>
+                              )
+                            )}
+                            {/* Review request button */}
+                            {booking.status === 'confirmed' && booking.paymentStatus !== 'unpaid' && (
+                              booking.reviewRequestSent ? (
+                                <span className="text-sm text-gray-500 font-medium flex items-center gap-1">
+                                  <Check className="w-3.5 h-3.5" />
+                                  Recenze odeslána
+                                </span>
+                              ) : (
+                                <button
+                                  onClick={() => handleSendReviewRequest(booking.id)}
+                                  className="flex items-center gap-1 px-3 py-1.5 bg-purple-500 text-white text-sm rounded hover:bg-purple-600 transition-colors"
+                                  title="Odeslat hostovi žádost o recenzi"
+                                >
+                                  <Send className="w-4 h-4" />
+                                  Žádost o recenzi
+                                </button>
+                              )
+                            )}
                             {/* Payment Buttons */}
                             {(booking.paymentStatus === 'unpaid' || !booking.paymentStatus) && (
                               <>
@@ -589,12 +620,16 @@ export default function AdminPage() {
                       </div>
                     </div>
                   ))}
-                  </div>
-                </>
+                </div>
               )}
             </>
               )}
             </>
+          )}
+
+          {/* Reviews Tab Content */}
+          {activeTab === 'reviews' && (
+            <ReviewsAdmin />
           )}
 
           {/* Calendar Tab Content */}
@@ -621,16 +656,6 @@ export default function AdminPage() {
         </div>
       </main>
       <Footer />
-
-      {/* Edit Booking Modal */}
-      {editingBooking && (
-        <EditBookingModal
-          booking={editingBooking}
-          isOpen={!!editingBooking}
-          onClose={() => setEditingBooking(null)}
-          onSave={handleSaveEdit}
-        />
-      )}
     </div>
   );
 }
