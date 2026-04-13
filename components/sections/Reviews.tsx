@@ -148,7 +148,7 @@ export default function Reviews() {
         {!isLoading && n > 0 && (
           <div className="relative">
             {/* Track wrapper */}
-            <div className="overflow-hidden">
+            <div className="overflow-hidden py-4">
               <div
                 style={{
                   display: 'flex',
