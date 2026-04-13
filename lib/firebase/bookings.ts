@@ -8,7 +8,6 @@ import {
   deleteDoc,
   query,
   where,
-  orderBy,
   Timestamp,
   DocumentData
 } from 'firebase/firestore';
@@ -109,12 +108,7 @@ export async function createBooking(bookingData: Omit<BookingData, 'createdAt' |
  */
 export async function getAllBookings(): Promise<BookingDocument[]> {
   try {
-    const q = query(
-      collection(db, BOOKINGS_COLLECTION),
-      orderBy('createdAt', 'desc')
-    );
-    
-    const querySnapshot = await getDocs(q);
+    const querySnapshot = await getDocs(collection(db, BOOKINGS_COLLECTION));
     const bookings: BookingDocument[] = [];
 
     querySnapshot.forEach((doc) => {
@@ -122,9 +116,13 @@ export async function getAllBookings(): Promise<BookingDocument[]> {
       bookings.push({
         id: doc.id,
         ...data,
-        createdAt: data.createdAt?.toDate() || new Date(),
+        createdAt: data.createdAt?.toDate() || new Date(0),
       } as BookingDocument);
     });
+
+    // Sort by createdAt descending in memory (avoids Firestore index requirement
+    // and ensures iCal-synced bookings without createdAt are included)
+    bookings.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
     return bookings;
   } catch (error) {
@@ -196,8 +194,7 @@ export async function getBookingsByEmail(email: string): Promise<BookingDocument
   try {
     const q = query(
       collection(db, BOOKINGS_COLLECTION),
-      where('email', '==', email),
-      orderBy('createdAt', 'desc')
+      where('email', '==', email)
     );
 
     const querySnapshot = await getDocs(q);
