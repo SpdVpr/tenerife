@@ -122,7 +122,7 @@ export async function getAllBookings(): Promise<BookingDocument[]> {
 
     // Sort by createdAt descending in memory (avoids Firestore index requirement
     // and ensures iCal-synced bookings without createdAt are included)
-    bookings.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+    bookings.sort((a, b) => b.checkIn.localeCompare(a.checkIn));
 
     return bookings;
   } catch (error) {
