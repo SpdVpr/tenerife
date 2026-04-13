@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Star, Check, X, Loader2, RefreshCw, Mail, Pencil, Save, Settings } from 'lucide-react';
+import { Star, Check, X, Loader2, RefreshCw, Mail, Pencil, Save, Settings, Trash2 } from 'lucide-react';
 import { getAllReviews, ReviewDocument, getReviewSettings, updateReviewSettings } from '@/lib/firebase/reviews';
 
 type Filter = 'all' | 'pending' | 'approved' | 'rejected';
@@ -175,6 +175,29 @@ export default function ReviewsAdmin() {
       setPendingCheckResult('Chyba při kontrole čekajících recenzí');
     } finally {
       setCheckingPending(false);
+    }
+  };
+
+  // ── Delete ────────────────────────────────────────────────────────────────
+  const handleDelete = async (reviewId: string) => {
+    if (!confirm('Opravdu chcete tuto recenzi trvale smazat?')) return;
+    setActionLoading((prev) => ({ ...prev, [reviewId]: true }));
+    try {
+      const response = await fetch('/api/reviews/delete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reviewId }),
+      });
+      if (response.ok) {
+        setReviews((prev) => prev.filter((r) => r.id !== reviewId));
+      } else {
+        const data = await response.json();
+        alert(`Chyba: ${data.error}`);
+      }
+    } catch {
+      alert('Chyba při mazání recenze');
+    } finally {
+      setActionLoading((prev) => ({ ...prev, [reviewId]: false }));
     }
   };
 
@@ -417,15 +440,26 @@ export default function ReviewsAdmin() {
 
                     {/* Right: actions */}
                     <div className="flex flex-col gap-2 shrink-0">
-                      {/* Edit button — always visible */}
-                      <button
-                        onClick={() => startEdit(review)}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded hover:bg-gray-200 transition-colors"
-                        title="Upravit recenzi"
-                      >
-                        <Pencil className="w-4 h-4" />
-                        Upravit
-                      </button>
+                      {/* Edit + Delete row */}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => startEdit(review)}
+                          className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-700 text-sm rounded hover:bg-gray-200 transition-colors"
+                          title="Upravit recenzi"
+                        >
+                          <Pencil className="w-4 h-4" />
+                          Upravit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(review.id)}
+                          disabled={isActing}
+                          className="flex items-center gap-1 px-3 py-1.5 bg-red-100 text-red-700 text-sm rounded hover:bg-red-200 transition-colors disabled:opacity-60"
+                          title="Smazat recenzi"
+                        >
+                          {isActing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                          Smazat
+                        </button>
+                      </div>
 
                       {/* Approve / reject — only for pending */}
                       {review.status === 'pending' && (

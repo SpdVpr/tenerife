@@ -52,8 +52,8 @@ service cloud.firestore {
       // Allow update for admin moderation
       allow update: if true;
 
-      // No deletes
-      allow delete: if false;
+      // Allow delete for admin
+      allow delete: if true;
     }
 
     // Settings collection (admin configuration)

@@ -6,6 +6,7 @@ import {
   setDoc,
   getDoc,
   updateDoc,
+  deleteDoc,
   query,
   where,
   Timestamp,
@@ -118,6 +119,19 @@ export async function getApprovedReviews(): Promise<ReviewDocument[]> {
   } catch (error) {
     console.error('Error getting approved reviews:', error);
     throw new Error('Failed to get approved reviews');
+  }
+}
+
+/**
+ * Delete a review permanently
+ */
+export async function deleteReview(reviewId: string): Promise<void> {
+  try {
+    await deleteDoc(doc(db, REVIEWS_COLLECTION, reviewId));
+    console.log('Review deleted:', reviewId);
+  } catch (error) {
+    console.error('Error deleting review:', error);
+    throw new Error('Failed to delete review');
   }
 }
 
